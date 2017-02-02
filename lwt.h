@@ -35,7 +35,10 @@ typedef struct _lwt_t
 	lwt_status_t status;	
 	lwt_fn_t fn;
 	void *data;
+	void *return_val;
 	uint parent_id;
+	struct _lwt_t *joiner;
+	struct _lwt_t *target;
 	struct _lwt_t *next;
 	struct _lwt_t *prev;
 }*lwt_t;
@@ -85,6 +88,6 @@ void *lwt_join(lwt_t thread);
 void lwt_die(void *data);
 int lwt_yield(lwt_t destination);
 lwt_t lwt_current(void);
-int lwt_id(lwt_t tcb);
+int lwt_id(lwt_t lwt);
 int lwt_info(lwt_info_t t);
 #endif
