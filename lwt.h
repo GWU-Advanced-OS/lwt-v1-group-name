@@ -5,40 +5,80 @@
 
 #define LWT_NULL NULL
 
-#define LWT_INFO_NTHD_RUNNABLE 0x1;
-#define LWT_INFO_NTHD_ZOMBIES 0x2;
-#define LWT_INFO_NTHD_BLOCKED 0x3;
-
 typedef unsigned long ulong;
 typedef unsigned int uint;
 typedef unsigned short ushort;
 typedef unsigned char uchar;
 
 typedef void *(*lwt_fn_t) (void *);
-typedef int lwt_info_t
+typedef enum {
+	LWT_INFO_NTHD_RUNNABLE,
+	LWT_INFO_NTHD_BLOCKED,
+	LWT_INFO_NTHD_ZOMBIES
+} lwt_info_t;
+
 typedef enum
 {
-	_ACTIVE,
-	_DEAD,
-	_BLOCKED,
-	_WAITING,
-}_TCB_STATE;
+	LWT_READY,
+	LWT_RUNNING,
+	LWT_BLOCKED,
+	LWT_FINISHED,
+	LWT_ZOMBIE,
+	LWT_DEAD
+}lwt_status_t;
 
-typedef struct lwt_tcb
+typedef struct _lwt_t
 {
-	int id;
 	ulong ip;
 	ulong sp;
-}lwt_tcb, *lwt_t;
+	uint id;
+	lwt_status_t status;	
+	lwt_fn_t fn;
+	void *data;
+	uint parent_id;
+	struct _lwt_t *next;
+	struct _lwt_t *prev;
+}*lwt_t;
 
 /*
  * auto-increment counter for thread
  */
-int lwt_counter;	
+uint lwt_counter = 0;	
 
-lwt_info_t LWT_INFO_NTHD_RUNNABLE;
-lwt_info_t LWT_INFO_NTHD_ZOMBIES;
-lwt_info_t LWT_INFO_NTHD_BLOCKED;
+/*
+ * counter for runable thread
+ */
+uint runable_counter;
+
+/*
+ * counter for blocked thread
+ */
+uint blocked_counter;
+
+/*
+ * counter for died thread
+ */
+uint died_counter;
+
+/*
+ * head of the queue of  thread
+ */
+lwt_t lwt_head;
+
+/*
+ *tail of the queue of thread
+ */
+lwt_t lwt_tail;
+
+/*
+ * current thread
+ */
+lwt_t lwt_current;
+
+/*
+ * the destination thread which is going to be operated
+ */
+lwt_t lwt_des;
 
 lwt_t lwt_create(lwt_fn_t fn, void *data);
 void *lwt_join(lwt_t thread);

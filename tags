@@ -4,31 +4,51 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+LWT_BLOCKED	lwt.h	/^	LWT_BLOCKED,$/;"	e	enum:__anon2
+LWT_DEAD	lwt.h	/^	LWT_DEAD$/;"	e	enum:__anon2
 LWT_DISPATCH_H	lwt_dispatch.h	2;"	d
-LWT_INFO_NTHD_BLOCKED	lwt.h	/^lwt_info_t LWT_INFO_NTHD_BLOCKED;$/;"	v
-LWT_INFO_NTHD_BLOCKED	lwt.h	8;"	d
-LWT_INFO_NTHD_RUNNABLE	lwt.h	/^lwt_info_t LWT_INFO_NTHD_RUNNABLE;$/;"	v
-LWT_INFO_NTHD_RUNNABLE	lwt.h	6;"	d
-LWT_INFO_NTHD_ZOMBIES	lwt.h	/^lwt_info_t LWT_INFO_NTHD_ZOMBIES;$/;"	v
-LWT_INFO_NTHD_ZOMBIES	lwt.h	7;"	d
+LWT_FINISHED	lwt.h	/^	LWT_FINISHED,$/;"	e	enum:__anon2
+LWT_INFO_NTHD_BLOCKED	lwt.h	/^	LWT_INFO_NTHD_BLOCKED$/;"	e	enum:__anon1
+LWT_INFO_NTHD_RUNNABLE	lwt.h	/^	LWT_INFO_NTHD_RUNNABLE,$/;"	e	enum:__anon1
+LWT_INFO_NTHD_ZOMBIES	lwt.h	/^	LWT_INFO_NTHD_ZOMBIES,$/;"	e	enum:__anon1
+LWT_NULL	lwt.h	6;"	d
+LWT_READY	lwt.h	/^	LWT_READY,$/;"	e	enum:__anon2
+LWT_RUNNING	lwt.h	/^	LWT_RUNNING,$/;"	e	enum:__anon2
+LWT_ZOMBIE	lwt.h	/^	LWT_ZOMBIE,$/;"	e	enum:__anon2
 STACK_SIZE	lwt.h	4;"	d
-_ACTIVE	lwt.h	/^	_ACTIVE,$/;"	e	enum:__anon1
-_BLOCKED	lwt.h	/^	_BLOCKED,$/;"	e	enum:__anon1
-_DEAD	lwt.h	/^	_DEAD,$/;"	e	enum:__anon1
 _LWT_H	lwt.h	2;"	d
-_TCB_STATE	lwt.h	/^}_TCB_STATE;$/;"	t	typeref:enum:__anon1
-_WAITING	lwt.h	/^	_WAITING,$/;"	e	enum:__anon1
-id	lwt.h	/^	int id;$/;"	m	struct:lwt_tcb
-ip	lwt.h	/^	ulong ip;$/;"	m	struct:lwt_tcb
+_lwt_t	lwt.h	/^typedef struct _lwt_t$/;"	s
+blocked_counter	lwt.h	/^uint blocked_counter;$/;"	v
+data	lwt.h	/^	void *data;$/;"	m	struct:_lwt_t
+died_counter	lwt.h	/^uint died_counter;$/;"	v
+fn	lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:_lwt_t
+id	lwt.h	/^	uint id;$/;"	m	struct:_lwt_t
+ip	lwt.h	/^	ulong ip;$/;"	m	struct:_lwt_t
 ip	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
 lwt_context	lwt_dispatch.h	/^struct lwt_context {$/;"	s
-lwt_counter	lwt.h	/^int lwt_counter;	$/;"	v
+lwt_counter	lwt.h	/^uint lwt_counter = 0;	$/;"	v
+lwt_create	lwt.c	/^lwt_t lwt_create(lwt_fn_t fn, void *data)$/;"	f
+lwt_current	lwt.c	/^lwt_t lwt_current(void)$/;"	f
+lwt_current	lwt.h	/^lwt_t lwt_current;$/;"	v
+lwt_des	lwt.h	/^lwt_t lwt_des;$/;"	v
+lwt_die	lwt.c	/^void lwt_die(void * data)$/;"	f
 lwt_fn_t	lwt.h	/^typedef void *(*lwt_fn_t) (void *);$/;"	t
-lwt_t	lwt.h	/^}lwt_tcb, *lwt_t;$/;"	t	typeref:struct:lwt_tcb
-lwt_tcb	lwt.h	/^typedef struct lwt_tcb$/;"	s
-lwt_tcb	lwt.h	/^}lwt_tcb, *lwt_t;$/;"	t	typeref:struct:lwt_tcb
-sp	lwt.h	/^	ulong sp;$/;"	m	struct:lwt_tcb
+lwt_head	lwt.h	/^lwt_t lwt_head;$/;"	v
+lwt_id	lwt.c	/^int lwt_id(lwt_t tcb)$/;"	f
+lwt_info	lwt.c	/^int lwt_info(lwt_info_t t)$/;"	f
+lwt_info_t	lwt.h	/^} lwt_info_t;$/;"	t	typeref:enum:__anon1
+lwt_join	lwt.c	/^void *lwt_join(lwt_t thread)$/;"	f
+lwt_status_t	lwt.h	/^}lwt_status_t;$/;"	t	typeref:enum:__anon2
+lwt_t	lwt.h	/^}*lwt_t;$/;"	t	typeref:struct:_lwt_t
+lwt_tail	lwt.h	/^lwt_t lwt_tail;$/;"	v
+lwt_yield	lwt.c	/^int lwt_yield(lwt_t destination)$/;"	f
+next	lwt.h	/^	struct _lwt_t *next;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
+parent_id	lwt.h	/^	uint parent_id;$/;"	m	struct:_lwt_t
+prev	lwt.h	/^	struct _lwt_t *prev;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
+runable_counter	lwt.h	/^uint runable_counter;$/;"	v
+sp	lwt.h	/^	ulong sp;$/;"	m	struct:_lwt_t
 sp	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
+status	lwt.h	/^	lwt_status_t status;	$/;"	m	struct:_lwt_t
 uchar	lwt.h	/^typedef unsigned char uchar;$/;"	t
 uint	lwt.h	/^typedef unsigned int uint;$/;"	t
 ulong	lwt.h	/^typedef unsigned long ulong;$/;"	t
