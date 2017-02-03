@@ -19,11 +19,8 @@ typedef enum {
 
 typedef enum
 {
-	LWT_READY,
-	LWT_RUNNING,
+	LWT_ACTIVE,
 	LWT_BLOCKED,
-	LWT_FINISHED,
-	LWT_ZOMBIE,
 	LWT_DEAD
 }lwt_status_t;
 
@@ -36,7 +33,6 @@ typedef struct _lwt_t
 	lwt_fn_t fn;
 	void *data;
 	void *return_val;
-	uint parent_id;
 	struct _lwt_t *joiner;
 	struct _lwt_t *target;
 	struct _lwt_t *next;
@@ -76,7 +72,7 @@ lwt_t lwt_tail;
 /*
  * current thread
  */
-lwt_t lwt_current;
+lwt_t lwt_curr;
 
 /*
  * the destination thread which is going to be operated
@@ -86,7 +82,7 @@ lwt_t lwt_des;
 lwt_t lwt_create(lwt_fn_t fn, void *data);
 void *lwt_join(lwt_t thread);
 void lwt_die(void *data);
-int lwt_yield(lwt_t destination);
+int lwt_yield(lwt_t lwt);
 lwt_t lwt_current(void);
 int lwt_id(lwt_t lwt);
 int lwt_info(lwt_info_t t);
