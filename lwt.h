@@ -1,6 +1,12 @@
 #ifndef _LWT_H
 #define _LWT_H
 
+#define __DEBUG
+
+#ifdef __DEBUG
+#define DEBUG(format,...) printf("[DEBUG INFO]: LINE %d"format"\n",__LINE__, ##__VA_ARGS__)
+#endif
+
 #define STACK_SIZE 4096
 
 #define LWT_NULL NULL
@@ -39,45 +45,7 @@ typedef struct _lwt_t
 	struct _lwt_t *prev;
 }*lwt_t;
 
-/*
- * auto-increment counter for thread
- */
-uint lwt_counter = 0;	
 
-/*
- * counter for runable thread
- */
-uint runable_counter;
-
-/*
- * counter for blocked thread
- */
-uint blocked_counter;
-
-/*
- * counter for died thread
- */
-uint died_counter;
-
-/*
- * head of the queue of  thread
- */
-lwt_t lwt_head;
-
-/*
- *tail of the queue of thread
- */
-lwt_t lwt_tail;
-
-/*
- * current thread
- */
-lwt_t lwt_curr;
-
-/*
- * the destination thread which is going to be operated
- */
-lwt_t lwt_des;
 
 lwt_t lwt_create(lwt_fn_t fn, void *data);
 void *lwt_join(lwt_t thread);
