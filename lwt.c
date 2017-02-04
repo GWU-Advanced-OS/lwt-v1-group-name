@@ -51,38 +51,57 @@ lwt_t lwt_des;
 
 lwt_t lwt_create(lwt_fn_t fn, void *data)
 {
-#ifdef __DEBUG
-	DEBUG();
-#endif
 
-	lwt_t lwt_new;
+	lwt_t lwt_new,freak;
 	/*
 	 * if current thread is NULL, make the new thread be the head
 	 */
 	if (lwt_head == LWT_NULL)
 	{
 		lwt_head = (lwt_t)malloc(sizeof(struct _lwt_t));
+		lwt_head->ip = 0;
+		lwt_head->sp = NULL;
+		lwt_head->bsp = NULL;
+		lwt_head->id = lwt_counter++;
 		lwt_curr = lwt_head;
 		lwt_curr->status = LWT_ACTIVE;
 		runable_counter++;
 		lwt_tail = lwt_head;
 	}
 	
-
 	//malloc the new thread and stack
+//	freak = (lwt_t)malloc(sizeof(struct _lwt_t));
+	if(lwt_head == lwt_curr)
+		printf("head == curr\n");
+	else
+		printf("head != curr \n");
+	printf("create curr_id = %d\n",lwt_curr->id);
+
 	lwt_new = (lwt_t)malloc(sizeof(struct _lwt_t));
-	lwt_counter++;
-	lwt_new->id = lwt_counter;
+//	free(freak);
+
+	lwt_new->id = lwt_counter++;
+	printf("create curr_id = %d\n",lwt_curr->id);
 	lwt_new->ip = (ulong) (&__lwt_start);
-	lwt_new->sp = (ulong) (malloc(STACK_SIZE) + STACK_SIZE - 4); 		//for free stack
+
+	lwt_new->bsp = (ulong) (malloc(STACK_SIZE)) ;	//be used to free the stack
+
+	lwt_new->sp = lwt_new->bsp + STACK_SIZE - 4; 		
+
 	lwt_new->status = LWT_ACTIVE;
+
 
 	lwt_new->joiner = LWT_NULL; 
 	lwt_new->fn = fn;
 	lwt_new->data = data;
 	runable_counter++;
 
+	lwt_des = lwt_new;
 
+
+	printf("create curr_id = %d\n",lwt_curr->id);
+	printf("des des_id = %d\n",lwt_des->id);
+	
 	enqueue(lwt_new);	
 
 	return lwt_new;
@@ -93,6 +112,7 @@ void *lwt_join(lwt_t lwt)
 #ifdef __DEBUG
 	DEBUG();
 #endif
+	printf("join curr_id = %d\n",lwt_curr->id);
 
 	void *temp_data;
 /*	if(lwt_curr->status == LWT_DEAD)
@@ -101,39 +121,44 @@ void *lwt_join(lwt_t lwt)
 	}
 	else
 	{*/
-	lwt_curr->joiner = lwt;
-	lwt->target = lwt_curr;
-	//}
+/*	if(lwt_curr->status != LWT_ACTIVE)
+	{
+		lwt_head->joiner = lwt;
+		lwt->target = lwt_head;
+	}
+	else
+	{*/
+		lwt_curr->joiner = lwt;
+		lwt->target = lwt_curr;
+//	}
 
 	if(lwt->status == LWT_DEAD)
 	{
 		died_counter--;
-
 	}
 	else
 	{
-
-//	if(lwt->target != LWT_NULL)
-//	{
+		printf("lwt_curr id = %d\n",lwt_curr->id);
+		printf("lwt_curr status = %d\n",lwt_curr->status);
+		printf("lwt id = %d\n",lwt->id);
+		printf("lwt status = %d\n",lwt->status);
 		lwt_curr->status = LWT_BLOCKED;
 		blocked_counter++;
 		runable_counter--;
-//	}
 
 		lwt_yield(lwt);
 	}
 
 	//free stack
-#ifdef __DEBUG
-	DEBUG();
-#endif
-	free((void *)lwt->sp - STACK_SIZE +4);
+	free(lwt->bsp);
 	lwt->prev->next = lwt->next;
+
 	//remove lwt from linked list
 	if (lwt->next == NULL)
 		lwt_tail = lwt->prev;
 	else
 		lwt->next->prev = lwt->prev;
+	died_counter--;
 	//free lwt
 	temp_data = lwt->return_val;
 	free(lwt);
@@ -153,8 +178,12 @@ void lwt_die(void *data)
 
 	if (lwt_curr->target != NULL)
 	{
-		lwt_curr->target->status = LWT_ACTIVE;
-		runable_counter++;
+		if(lwt_curr->target->status == LWT_BLOCKED)
+		{
+			blocked_counter--;
+			lwt_curr->target->status = LWT_ACTIVE;
+			runable_counter++;
+		}
 	}
 	
 	//mark the current thread state as DEAD, free the stack
@@ -174,37 +203,37 @@ void lwt_die(void *data)
 int lwt_yield(lwt_t lwt)
 {
 #ifdef __DEBUG
-	DEBUG();
+	DEBUG();	
 #endif
 	if(lwt == NULL)
 	{
 		__lwt_schedule();
-#ifdef __DEBUG
-		DEBUG();
-#endif
 	
 	}
-
 	else if (lwt->status == LWT_ACTIVE)
 	{
 		lwt_des = lwt;
-		struct lwt_context curr,next;
-#ifdef __DEBUG
+		struct lwt_context *curr,*next;
 
-	DEBUG();
-#endif
-		memcpy(&curr,lwt_curr,sizeof(struct lwt_context));
-#ifdef __DEBUG
-	DEBUG();
-	printf("des ip = %d, sp = %d\n",lwt_curr->ip,lwt_curr->sp);
-#endif
-		memcpy(&next,lwt_des,sizeof(struct lwt_context));
+		curr = (struct lwt_context *) lwt_curr;
+		next = (struct lwt_context *) lwt_des;
+		//memcpy(&curr,lwt_curr,sizeof(struct lwt_context));
+		//memcpy(&next,lwt_des,sizeof(struct lwt_context));
 		
 #ifdef __DEBUG
-		DEBUG();
+	DEBUG();
+	printf("cur id = %d, ip = %d, sp = %d\n",lwt_curr->id,curr->ip,curr->sp);
+	printf("des id = %d, ip = %d, sp = %d\n",lwt_des->id,next->ip,next->sp);
 #endif
-		__lwt_dispatch(&curr,&next);
+
+		__lwt_dispatch(curr,next);
 	}
+	else 
+	{
+		printf("status = %d\n",lwt->status);
+		printf("head status = %d\n",lwt_head->status);
+	}
+	return -1;
 }
 
 lwt_t lwt_current(void)
@@ -258,6 +287,8 @@ void __lwt_start()
 	DEBUG();
 #endif
 	lwt_curr = lwt_des;
+	printf("current id = %d,ip = %d, sp = %d\n",lwt_curr->id,lwt_curr->ip,lwt_curr->sp);
+	
 	void *return_val = lwt_curr->fn(lwt_curr->data);
 	lwt_die(return_val);
 
@@ -282,9 +313,6 @@ void __lwt_schedule(void)
 	//get next ACTIVE thread
 	if (lwt_curr->next != LWT_NULL) 
 	{	
-#ifdef __DEBUG
-	DEBUG();
-#endif	
 		temp = lwt_curr->next;
 	} 
 	else 
@@ -294,7 +322,6 @@ void __lwt_schedule(void)
 	
 	while (temp->status != LWT_ACTIVE)
 	{
-DEBUG();
 		if (temp->next != NULL)
 		{
 			temp = temp->next;
@@ -305,18 +332,37 @@ DEBUG();
 		}
 	}
 #ifdef __DEBUG
-	printf("head ip = %d, sp = %d\n",temp->ip,temp->sp);
 
-	printf("current ip = %d, sp = %d\n",lwt_curr->ip,lwt_curr->sp);
+	printf("temp ip = %d, sp = %d\n",temp->ip,temp->sp);
+	printf("head ip = %d, sp = %d\n",lwt_head->ip,lwt_head->sp);
+	
+	printf("current id = %d,ip = %d, sp = %d\n",lwt_curr->id,lwt_curr->ip,lwt_curr->sp);
 #endif
 	if (temp != lwt_curr)
 	{
 		//printf("/////Yielding to %d\n", temp->id);
 		lwt_des = temp;
-		struct lwt_context curr,next;
-		memcpy(&curr,lwt_curr,sizeof(struct lwt_context));
-    	memcpy(&next,lwt_des,sizeof(struct lwt_context));
-		__lwt_dispatch(&curr, &next);
+
+		struct lwt_context *curr,*next;
+		curr = (struct lwt_context *) lwt_curr;
+		next = (struct lwt_context *) lwt_des;
+		//memcpy(&curr,lwt_curr,sizeof(struct lwt_context));
+    	//memcpy(&next,lwt_des,sizeof(struct lwt_context));
+#ifdef __DEBUG
+		DEBUG();
+#endif
+		if(lwt_des != lwt_head)
+			__lwt_dispatch(curr, next);
+		else
+		{
+			struct lwt_context current;
+			memcpy(&current,lwt_curr,sizeof(struct lwt_context));
+			lwt_curr = lwt_des;
+			__lwt_dispatch(&current,next);
+		}
+#ifdef _DEBUG
+		DEBUG();
+#endif
 	}
 #ifdef __DEBUG
 	DEBUG();

@@ -34,6 +34,7 @@ typedef struct _lwt_t
 {
 	ulong ip;
 	ulong sp;
+	ulong bsp;	//the base of the stack pointer
 	uint id;
 	lwt_status_t status;	
 	lwt_fn_t fn;

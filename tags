@@ -4,51 +4,72 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+DEBUG	lwt.h	7;"	d
+IS_RESET	main.c	42;"	d	file:
+ITER	main.c	9;"	d	file:
+LWT_ACTIVE	lwt.h	/^	LWT_ACTIVE,$/;"	e	enum:__anon2
 LWT_BLOCKED	lwt.h	/^	LWT_BLOCKED,$/;"	e	enum:__anon2
 LWT_DEAD	lwt.h	/^	LWT_DEAD$/;"	e	enum:__anon2
 LWT_DISPATCH_H	lwt_dispatch.h	2;"	d
-LWT_FINISHED	lwt.h	/^	LWT_FINISHED,$/;"	e	enum:__anon2
-LWT_INFO_NTHD_BLOCKED	lwt.h	/^	LWT_INFO_NTHD_BLOCKED$/;"	e	enum:__anon1
+LWT_INFO_NTHD_BLOCKED	lwt.h	/^	LWT_INFO_NTHD_BLOCKED,$/;"	e	enum:__anon1
 LWT_INFO_NTHD_RUNNABLE	lwt.h	/^	LWT_INFO_NTHD_RUNNABLE,$/;"	e	enum:__anon1
-LWT_INFO_NTHD_ZOMBIES	lwt.h	/^	LWT_INFO_NTHD_ZOMBIES,$/;"	e	enum:__anon1
-LWT_NULL	lwt.h	6;"	d
-LWT_READY	lwt.h	/^	LWT_READY,$/;"	e	enum:__anon2
-LWT_RUNNING	lwt.h	/^	LWT_RUNNING,$/;"	e	enum:__anon2
-LWT_ZOMBIE	lwt.h	/^	LWT_ZOMBIE,$/;"	e	enum:__anon2
-STACK_SIZE	lwt.h	4;"	d
+LWT_INFO_NTHD_ZOMBIES	lwt.h	/^	LWT_INFO_NTHD_ZOMBIES$/;"	e	enum:__anon1
+LWT_NULL	lwt.h	12;"	d
+STACK_SIZE	lwt.h	10;"	d
 _LWT_H	lwt.h	2;"	d
+__DEBUG	lwt.h	4;"	d
+__lwt_schedule	lwt.c	/^void __lwt_schedule(void)$/;"	f
+__lwt_start	lwt.c	/^void __lwt_start()$/;"	f
 _lwt_t	lwt.h	/^typedef struct _lwt_t$/;"	s
-blocked_counter	lwt.h	/^uint blocked_counter;$/;"	v
+blocked_counter	lwt.c	/^uint blocked_counter;$/;"	v
+curr	main.c	/^volatile int curr = 0;$/;"	v
 data	lwt.h	/^	void *data;$/;"	m	struct:_lwt_t
-died_counter	lwt.h	/^uint died_counter;$/;"	v
+died_counter	lwt.c	/^uint died_counter;$/;"	v
+enqueue	lwt.c	/^void enqueue(lwt_t lwt)$/;"	f
 fn	lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:_lwt_t
+fn_bounce	main.c	/^fn_bounce(void *d) $/;"	f
+fn_identity	main.c	/^fn_identity(void *d)$/;"	f
+fn_join	main.c	/^fn_join(void *d)$/;"	f
+fn_nested_joins	main.c	/^fn_nested_joins(void *d)$/;"	f
+fn_null	main.c	/^fn_null(void *d)$/;"	f
+fn_sequence	main.c	/^fn_sequence(void *d)$/;"	f
 id	lwt.h	/^	uint id;$/;"	m	struct:_lwt_t
 ip	lwt.h	/^	ulong ip;$/;"	m	struct:_lwt_t
 ip	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
+joiner	lwt.h	/^	struct _lwt_t *joiner;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
 lwt_context	lwt_dispatch.h	/^struct lwt_context {$/;"	s
-lwt_counter	lwt.h	/^uint lwt_counter = 0;	$/;"	v
+lwt_counter	lwt.c	/^uint lwt_counter = 0;	$/;"	v
 lwt_create	lwt.c	/^lwt_t lwt_create(lwt_fn_t fn, void *data)$/;"	f
+lwt_curr	lwt.c	/^lwt_t lwt_curr;$/;"	v
 lwt_current	lwt.c	/^lwt_t lwt_current(void)$/;"	f
-lwt_current	lwt.h	/^lwt_t lwt_current;$/;"	v
-lwt_des	lwt.h	/^lwt_t lwt_des;$/;"	v
-lwt_die	lwt.c	/^void lwt_die(void * data)$/;"	f
+lwt_des	lwt.c	/^lwt_t lwt_des;$/;"	v
+lwt_die	lwt.c	/^void lwt_die(void *data)$/;"	f
 lwt_fn_t	lwt.h	/^typedef void *(*lwt_fn_t) (void *);$/;"	t
-lwt_head	lwt.h	/^lwt_t lwt_head;$/;"	v
-lwt_id	lwt.c	/^int lwt_id(lwt_t tcb)$/;"	f
+lwt_head	lwt.c	/^lwt_t lwt_head;$/;"	v
+lwt_id	lwt.c	/^int lwt_id(lwt_t lwt)$/;"	f
 lwt_info	lwt.c	/^int lwt_info(lwt_info_t t)$/;"	f
 lwt_info_t	lwt.h	/^} lwt_info_t;$/;"	t	typeref:enum:__anon1
-lwt_join	lwt.c	/^void *lwt_join(lwt_t thread)$/;"	f
+lwt_join	lwt.c	/^void *lwt_join(lwt_t lwt)$/;"	f
 lwt_status_t	lwt.h	/^}lwt_status_t;$/;"	t	typeref:enum:__anon2
 lwt_t	lwt.h	/^}*lwt_t;$/;"	t	typeref:struct:_lwt_t
-lwt_tail	lwt.h	/^lwt_t lwt_tail;$/;"	v
-lwt_yield	lwt.c	/^int lwt_yield(lwt_t destination)$/;"	f
+lwt_tail	lwt.c	/^lwt_t lwt_tail;$/;"	v
+lwt_yield	lwt.c	/^int lwt_yield(lwt_t lwt)$/;"	f
+main	main.c	/^main(void)$/;"	f
+main	test.c	/^void main()$/;"	f
 next	lwt.h	/^	struct _lwt_t *next;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
-parent_id	lwt.h	/^	uint parent_id;$/;"	m	struct:_lwt_t
 prev	lwt.h	/^	struct _lwt_t *prev;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
-runable_counter	lwt.h	/^uint runable_counter;$/;"	v
+rdtscll	main.c	7;"	d	file:
+return_val	lwt.h	/^	void *return_val;$/;"	m	struct:_lwt_t
+runable_counter	lwt.c	/^uint runable_counter;$/;"	v
+sched	main.c	/^volatile int sched[2] = {0, 0};$/;"	v
 sp	lwt.h	/^	ulong sp;$/;"	m	struct:_lwt_t
 sp	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
 status	lwt.h	/^	lwt_status_t status;	$/;"	m	struct:_lwt_t
+target	lwt.h	/^	struct _lwt_t *target;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
+test	test.c	/^void *test()$/;"	f
+test1	test.c	/^void *test1()$/;"	f
+test_crt_join_sched	main.c	/^test_crt_join_sched(void)$/;"	f
+test_perf	main.c	/^test_perf(void)$/;"	f
 uchar	lwt.h	/^typedef unsigned char uchar;$/;"	t
 uint	lwt.h	/^typedef unsigned int uint;$/;"	t
 ulong	lwt.h	/^typedef unsigned long ulong;$/;"	t

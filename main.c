@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include <lwt.h>
+#include "lwt.h"
 
 #define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
 
-#define ITER 10000
+#define ITER 3
 
 /* 
  * My output on an Intel Core i5-2520M CPU @ 2.50GHz:
@@ -55,11 +55,16 @@ test_perf(void)
 	/* Performance tests */
 	rdtscll(start);
 	for (i = 0 ; i < ITER ; i++) {
-		chld1 = lwt_create(fn_null, NULL);
+		chld1 = lwt_create(fn_null, NULL);		
+		printf("id = %d\n",lwt_id(lwt_current()));
 		lwt_join(chld1);
 	}
 	rdtscll(end);
 	printf("[PERF] %5lld <- fork/join\n", (end-start)/ITER);
+#ifdef __DEBUG
+	DEBUG();
+#endif
+	printf("run = %d,blocked = %d,died = %d\n", lwt_info(LWT_INFO_NTHD_RUNNABLE),lwt_info(LWT_INFO_NTHD_BLOCKED),lwt_info(LWT_INFO_NTHD_ZOMBIES));
 	IS_RESET();
 
 	chld1 = lwt_create(fn_bounce, (void*)1);
