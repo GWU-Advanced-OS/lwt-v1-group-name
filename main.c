@@ -6,7 +6,7 @@
 
 #define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
 
-#define ITER 3
+#define ITER 10000
 
 /* 
  * My output on an Intel Core i5-2520M CPU @ 2.50GHz:
@@ -21,16 +21,47 @@ fn_bounce(void *d)
 {
 	int i;
 	unsigned long long start, end;
+#ifdef __DEBUG
+	printf("current id = %d, ip = %d, sp = %d\n",lwt_id(lwt_current()),lwt_current()->ip, lwt_current()->sp);
+	DEBUG();
+	printf("prev id = %d, ip = %d, sp = %d\n",lwt_current()->prev->id,lwt_current()->prev->ip,lwt_current()->prev->sp);
+#endif
+	lwt_yield(LWT_NULL);
+#ifdef __DEBUG
 
+	printf("current id = %d, ip = %d, sp = %d\n",lwt_id(lwt_current()),lwt_current()->ip, lwt_current()->sp);
+	DEBUG();
+	printf("prev id = %d, ip = %d, sp = %d\n",lwt_current()->prev->id,lwt_current()->prev->ip,lwt_current()->prev->sp);
+#endif
 	lwt_yield(LWT_NULL);
-	lwt_yield(LWT_NULL);
+#ifdef __DEBUG
+
+	printf("current id = %d, ip = %d, sp = %d\n",lwt_id(lwt_current()),lwt_current()->ip, lwt_current()->sp);
+	DEBUG();
+	printf("prev id = %d, ip = %d, sp = %d\n",lwt_current()->prev->id,lwt_current()->prev->ip,lwt_current()->prev->sp);
+#endif
+	
 	rdtscll(start);
-	for (i = 0 ; i < ITER ; i++) lwt_yield(LWT_NULL);
+	for (i = 0 ; i < ITER ; i++){ lwt_yield(LWT_NULL);/*printf("round %d\n",i);*/}
 	rdtscll(end);
+#ifdef __DEBUG
+	printf("prev id = %d, ip = %d, sp = %d\n",lwt_current()->prev->id,lwt_current()->prev->ip,lwt_current()->prev->sp);
+	printf("current id = %d, ip = %d, sp = %d\n",lwt_id(lwt_current()),lwt_current()->ip, lwt_current()->sp);
+	DEBUG();
+
+#endif
 	lwt_yield(LWT_NULL);
+#ifdef __DEBUG
+	printf("prev id = %d, ip = %d, sp = %d\n",lwt_current()->prev->id,lwt_current()->prev->ip,lwt_current()->prev->sp);
+	printf("current id = %d, ip = %d, sp = %d\n",lwt_id(lwt_current()),lwt_current()->ip, lwt_current()->sp);
+	DEBUG();
+	
+#endif
 	lwt_yield(LWT_NULL);
+
 
 	if (!d) printf("[PERF] %5lld <- yield\n", (end-start)/(ITER*2));
+
 
 	return NULL;
 }
@@ -56,7 +87,6 @@ test_perf(void)
 	rdtscll(start);
 	for (i = 0 ; i < ITER ; i++) {
 		chld1 = lwt_create(fn_null, NULL);		
-		printf("id = %d\n",lwt_id(lwt_current()));
 		lwt_join(chld1);
 	}
 	rdtscll(end);
@@ -69,8 +99,11 @@ test_perf(void)
 
 	chld1 = lwt_create(fn_bounce, (void*)1);
 	chld2 = lwt_create(fn_bounce, NULL);
+//	lwt_yield(LWT_NULL);
 	lwt_join(chld1);
 	lwt_join(chld2);
+
+	printf("run = %d,blocked = %d,died = %d\n", lwt_info(LWT_INFO_NTHD_RUNNABLE),lwt_info(LWT_INFO_NTHD_BLOCKED),lwt_info(LWT_INFO_NTHD_ZOMBIES));
 	IS_RESET();
 }
 
@@ -100,14 +133,33 @@ void *
 fn_sequence(void *d)
 {
 	int i, other, val = (int)d;
-
+#ifdef __DEBUG
+	DEBUG();
+#endif
 	for (i = 0 ; i < ITER ; i++) {
 		other = curr;
+#ifdef __DEBUG
+	DEBUG();
+#endif
 		curr  = (curr + 1) % 2;
+#ifdef __DEBUG
+	DEBUG();
+#endif
 		sched[curr] = val;
+#ifdef __DEBUG
+	DEBUG();
+	printf("left = %d,val = %d\n",sched[other],val);
+#endif
 		assert(sched[other] != val);
+#ifdef __DEBUG
+	DEBUG();
+#endif
 		lwt_yield(LWT_NULL);
+#ifdef __DEBUG
+	DEBUG();
+#endif
 	}
+
 
 	return NULL;
 }
@@ -132,26 +184,49 @@ test_crt_join_sched(void)
 	/* functional tests: scheduling */
 	lwt_yield(LWT_NULL);
 
+#ifdef __DEBUG
+	DEBUG();
+#endif
 	chld1 = lwt_create(fn_sequence, (void*)1);
 	chld2 = lwt_create(fn_sequence, (void*)2);
 	lwt_join(chld2);
 	lwt_join(chld1);	
 	IS_RESET();
 
+#ifdef __DEBUG
+	DEBUG();
+#endif
 	/* functional tests: join */
 	chld1 = lwt_create(fn_null, NULL);
 	lwt_join(chld1);
 	IS_RESET();
 
+#ifdef __DEBUG
+	DEBUG();
+#endif
 	chld1 = lwt_create(fn_null, NULL);
+
+#ifdef __DEBUG
+	DEBUG();
+	printf("chld1 id = %d, status = %d\n",chld1->id,chld1->status);
+#endif
 	lwt_yield(LWT_NULL);
+#ifdef __DEBUG
+	DEBUG();
+#endif
 	lwt_join(chld1);
 	IS_RESET();
 
+#ifdef __DEBUG
+	DEBUG();
+#endif
 	chld1 = lwt_create(fn_nested_joins, NULL);
 	lwt_join(chld1);
 	IS_RESET();
 
+#ifdef __DEBUG
+	DEBUG();
+#endif
 	/* functional tests: join only from parents */
 	chld1 = lwt_create(fn_identity, (void*)0x37337);
 	chld2 = lwt_create(fn_join, chld1);
@@ -161,6 +236,9 @@ test_crt_join_sched(void)
 	//lwt_join(chld1);
 	IS_RESET();
 
+#ifdef __DEBUG
+	DEBUG();
+#endif
 	/* functional tests: passing data between threads */
 	chld1 = lwt_create(fn_identity, (void*)0x37337);
 	assert((void*)0x37337 == lwt_join(chld1));
@@ -177,6 +255,7 @@ test_crt_join_sched(void)
 int
 main(void)
 {
+//	assert(0 == 1);
 	test_perf();
 	test_crt_join_sched();
 

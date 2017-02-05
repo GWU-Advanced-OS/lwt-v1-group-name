@@ -1,10 +1,10 @@
 #ifndef _LWT_H
 #define _LWT_H
 
-#define __DEBUG
+//#define __DEBUG
 
 #ifdef __DEBUG
-#define DEBUG(format,...) printf("[DEBUG INFO]: LINE %d"format"\n",__LINE__, ##__VA_ARGS__)
+#define DEBUG(format,...) printf("[DEBUG INFO]: FILE %s, LINE %d"format"\n",__FILE__,__LINE__, ##__VA_ARGS__)
 #endif
 
 #define STACK_SIZE 4096
@@ -30,11 +30,18 @@ typedef enum
 	LWT_DEAD
 }lwt_status_t;
 
+typedef struct _stack_t
+{
+	ulong bsp;	//the base of the stack pointer
+	uchar flag;	//0 is free, 1 is busy;
+	struct _stack_t *next;
+}*stack_t;
+
 typedef struct _lwt_t
 {
 	ulong ip;
 	ulong sp;
-	ulong bsp;	//the base of the stack pointer
+	stack_t stack;
 	uint id;
 	lwt_status_t status;	
 	lwt_fn_t fn;
@@ -45,7 +52,6 @@ typedef struct _lwt_t
 	struct _lwt_t *next;
 	struct _lwt_t *prev;
 }*lwt_t;
-
 
 
 lwt_t lwt_create(lwt_fn_t fn, void *data);

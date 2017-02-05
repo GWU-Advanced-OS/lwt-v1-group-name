@@ -5,7 +5,7 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 DEBUG	lwt.h	7;"	d
-IS_RESET	main.c	42;"	d	file:
+IS_RESET	main.c	73;"	d	file:
 ITER	main.c	9;"	d	file:
 LWT_ACTIVE	lwt.h	/^	LWT_ACTIVE,$/;"	e	enum:__anon2
 LWT_BLOCKED	lwt.h	/^	LWT_BLOCKED,$/;"	e	enum:__anon2
@@ -17,15 +17,24 @@ LWT_INFO_NTHD_ZOMBIES	lwt.h	/^	LWT_INFO_NTHD_ZOMBIES$/;"	e	enum:__anon1
 LWT_NULL	lwt.h	12;"	d
 STACK_SIZE	lwt.h	10;"	d
 _LWT_H	lwt.h	2;"	d
-__DEBUG	lwt.h	4;"	d
 __lwt_schedule	lwt.c	/^void __lwt_schedule(void)$/;"	f
+__lwt_stack_get	lwt.c	/^void *__lwt_stack_get()$/;"	f
 __lwt_start	lwt.c	/^void __lwt_start()$/;"	f
 _lwt_t	lwt.h	/^typedef struct _lwt_t$/;"	s
+_stack_t	lwt.h	/^typedef struct _stack_t$/;"	s
+a	test.c	/^struct lwt_context a,b,c;$/;"	v	typeref:struct:lwt_context
+b	test.c	/^struct lwt_context a,b,c;$/;"	v	typeref:struct:
 blocked_counter	lwt.c	/^uint blocked_counter;$/;"	v
+bsp	lwt.h	/^	ulong bsp;	\/\/the base of the stack pointer$/;"	m	struct:_lwt_t
+bsp	lwt.h	/^	ulong bsp;$/;"	m	struct:_stack_t
+c	test.c	/^struct lwt_context a,b,c;$/;"	v	typeref:struct:
 curr	main.c	/^volatile int curr = 0;$/;"	v
 data	lwt.h	/^	void *data;$/;"	m	struct:_lwt_t
+dequeue	lwt.c	/^void* dequeue(lwt_t lwt)$/;"	f
 died_counter	lwt.c	/^uint died_counter;$/;"	v
 enqueue	lwt.c	/^void enqueue(lwt_t lwt)$/;"	f
+flag	lwt.h	/^	uchar flag;	\/\/0 is free, 1 is busy;$/;"	m	struct:_stack_t
+flag	test.c	/^int flag=0;$/;"	v
 fn	lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:_lwt_t
 fn_bounce	main.c	/^fn_bounce(void *d) $/;"	f
 fn_identity	main.c	/^fn_identity(void *d)$/;"	f
@@ -56,21 +65,32 @@ lwt_tail	lwt.c	/^lwt_t lwt_tail;$/;"	v
 lwt_yield	lwt.c	/^int lwt_yield(lwt_t lwt)$/;"	f
 main	main.c	/^main(void)$/;"	f
 main	test.c	/^void main()$/;"	f
+main	test1.c	/^void main()$/;"	f
 next	lwt.h	/^	struct _lwt_t *next;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
+next	lwt.h	/^	struct _stack_t *next;$/;"	m	struct:_stack_t	typeref:struct:_stack_t::_stack_t
 prev	lwt.h	/^	struct _lwt_t *prev;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
 rdtscll	main.c	7;"	d	file:
 return_val	lwt.h	/^	void *return_val;$/;"	m	struct:_lwt_t
 runable_counter	lwt.c	/^uint runable_counter;$/;"	v
 sched	main.c	/^volatile int sched[2] = {0, 0};$/;"	v
 sp	lwt.h	/^	ulong sp;$/;"	m	struct:_lwt_t
+sp	lwt.h	/^	ulong sp;$/;"	m	struct:_stack_t
 sp	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
+sss	test.c	/^void sss()$/;"	f
+stack_curr	lwt.c	/^stack_t stack_curr = NULL;$/;"	v
+stack_head	lwt.c	/^stack_t stack_head = NULL;$/;"	v
+stack_t	lwt.h	/^}*stack_t;$/;"	t	typeref:struct:_stack_t
 status	lwt.h	/^	lwt_status_t status;	$/;"	m	struct:_lwt_t
 target	lwt.h	/^	struct _lwt_t *target;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
 test	test.c	/^void *test()$/;"	f
 test1	test.c	/^void *test1()$/;"	f
 test_crt_join_sched	main.c	/^test_crt_join_sched(void)$/;"	f
 test_perf	main.c	/^test_perf(void)$/;"	f
+thread	test1.c	/^void thread()$/;"	f
+thread1	test1.c	/^void thread1()$/;"	f
+ttt	test.c	/^void ttt()$/;"	f
 uchar	lwt.h	/^typedef unsigned char uchar;$/;"	t
 uint	lwt.h	/^typedef unsigned int uint;$/;"	t
 ulong	lwt.h	/^typedef unsigned long ulong;$/;"	t
 ushort	lwt.h	/^typedef unsigned short ushort;$/;"	t
+yield	test1.c	/^void yield()$/;"	f
