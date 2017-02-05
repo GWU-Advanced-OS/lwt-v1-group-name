@@ -97,11 +97,6 @@ lwt_t lwt_create(lwt_fn_t fn, void *data)
 	//malloc the new thread and stack
 
 
-
-
-
-
-
 	lwt_new = (lwt_t)malloc(sizeof(struct _lwt_t));
 	lwt_new->id = lwt_counter++;
 	lwt_new->ip = (ulong) (&__lwt_start);
@@ -342,8 +337,16 @@ void __lwt_schedule(void)
 #ifdef __DEBUG
 DEBUG();
 #endif
-	
-	//get next ACTIVE thread
+	if(lwt_curr != lwt_head && lwt_curr != lwt_tail)
+	{		
+		lwt_curr->next->prev = lwt_curr->prev;
+		lwt_curr->prev->next = lwt_curr->next;
+		lwt_tail->next = lwt_curr;
+		lwt_curr->prev = lwt_tail;
+		lwt_curr->next = NULL;
+		lwt_tail = lwt_curr;
+	}
+/*	//get next ACTIVE thread
 	if (lwt_head->next != LWT_NULL) 
 	{
 		temp = lwt_head->next;
@@ -356,7 +359,7 @@ DEBUG();
 #endif
 
 		temp = lwt_head;
-	}
+	}*/
 #ifdef __DEBUG
 DEBUG();
 
@@ -380,7 +383,8 @@ DEBUG();
 		}
 		//printf("temp id = %d, status = %d, ip = %d, sp = %d\n",temp->id,temp->status,temp->ip,temp->sp);
 	}*/
-	while(temp != lwt_head)// && (temp->status != LWT_ACTIVE ||  temp == lwt_curr))
+
+/*	while(temp != lwt_head)// && (temp->status != LWT_ACTIVE ||  temp == lwt_curr))
 	{
 		if(temp != lwt_curr && temp->status == LWT_ACTIVE)
 			break;
@@ -393,11 +397,17 @@ DEBUG();
 			temp = lwt_head;
 		}
 //		printf("temp id = %d, status = %d, next = %d\n",temp->id,temp->status,temp->next->id);
+	}*/
+
+	temp = lwt_head;
+	while(temp->status != LWT_ACTIVE)
+	{
+		temp = temp->next;
 	}
-	if(temp->status != LWT_ACTIVE)
+/*	if(temp->status != LWT_ACTIVE)
 	{
 		temp = lwt_curr;
-	}
+	}*/
 #ifdef __DEBUG
 
 	printf("des id = %d, status = %d, ip = %d, sp = %d\n",temp->id,temp->status,temp->ip,temp->sp);
