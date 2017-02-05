@@ -444,8 +444,7 @@ DEBUG();
 			"1:"							//LABEL
 			"popal"
 			:: "a"(&curr->ip), "b"(&curr->sp), "c"(next->ip), "d"(next->sp)
-			: "cc", "memory"
-																							);
+			: "cc", "memory");
 			//for switching back to old thread, nested?
 			curr = next;
 			return;	
