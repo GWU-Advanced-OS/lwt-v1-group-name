@@ -1,12 +1,12 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include"lwt_dispatch.h"
+//#include"lwt_dispatch.h"
 #include"lwt.h"
 
 
 void __lwt_start();
 void __lwt_schedule(void);
-//static inline void __lwt_dispatch(lwt_t curr, lwt_t next);	
+static inline void __lwt_dispatch(lwt_t curr, lwt_t next);	
 void enqueue(lwt_t lwt);
 void* dequeue(lwt_t lwt);
 void *__lwt_stack_get(void);
@@ -266,7 +266,7 @@ int lwt_yield(lwt_t lwt)
 #endif
 		lwt_t tmp_curr = lwt_curr;
 		lwt_curr = lwt_des;
-		__lwt_dispatch((struct lwt_context *)tmp_curr,(struct lwt_context *)lwt_des);
+		__lwt_dispatch(/*(struct lwt_context *)*/tmp_curr,/*(struct lwt_context *)*/lwt_des);
 	}
 #ifdef __DEBUG
 	else 
@@ -443,7 +443,7 @@ DEBUG();
 
 		lwt_t tmp_curr = lwt_curr;
 		lwt_curr = lwt_des;
-		__lwt_dispatch((struct lwt_context *)tmp_curr, (struct lwt_context *)lwt_des);
+		__lwt_dispatch(/*(struct lwt_context *)*/tmp_curr, /*(struct lwt_context *)*/lwt_des);
 #ifdef _DEBUG
 	DEBUG();
 #endif
@@ -453,7 +453,7 @@ DEBUG();
 #endif
 	return;	
 }
-/*
+
 static inline void __lwt_dispatch(lwt_t curr, lwt_t next)	
 {
 	__asm__ __volatile__(	
@@ -467,9 +467,9 @@ static inline void __lwt_dispatch(lwt_t curr, lwt_t next)
 			:: "a"(&curr->ip), "b"(&curr->sp), "c"(next->ip), "d"(next->sp)
 			: "cc", "memory");
 			//for switching back to old thread, nested?
-			curr = next;
-			return;	
-}*/
+
+	return;	
+}
 void enqueue(lwt_t lwt)
 {
 	lwt->next = NULL;

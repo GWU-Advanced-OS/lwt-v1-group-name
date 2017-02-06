@@ -17,7 +17,7 @@ LWT_INFO_NTHD_ZOMBIES	lwt.h	/^	LWT_INFO_NTHD_ZOMBIES$/;"	e	enum:__anon1
 LWT_NULL	lwt.h	12;"	d
 STACK_SIZE	lwt.h	10;"	d
 _LWT_H	lwt.h	2;"	d
-__DEBUG	lwt.h	4;"	d
+__lwt_dispatch	lwt.c	/^static inline void __lwt_dispatch(lwt_t curr, lwt_t next)	$/;"	f	file:
 __lwt_schedule	lwt.c	/^void __lwt_schedule(void)$/;"	f
 __lwt_stack_get	lwt.c	/^void *__lwt_stack_get()$/;"	f
 __lwt_stack_return	lwt.c	/^void __lwt_stack_return(void *lwt)$/;"	f
