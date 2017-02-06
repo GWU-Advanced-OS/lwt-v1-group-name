@@ -86,7 +86,7 @@ test_perf(void)
 	/* Performance tests */
 	rdtscll(start);
 	for (i = 0 ; i < ITER ; i++) {
-		chld1 = lwt_create(fn_null, NULL);		
+		chld1 = lwt_create(fn_null, NULL);	
 		lwt_join(chld1);
 	}
 	rdtscll(end);

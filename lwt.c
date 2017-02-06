@@ -6,11 +6,13 @@
 
 void __lwt_start();
 void __lwt_schedule(void);
-//void __lwt_dispatch(lwt_t curr, lwt_t next);	
+//static inline void __lwt_dispatch(lwt_t curr, lwt_t next);	
 void enqueue(lwt_t lwt);
 void* dequeue(lwt_t lwt);
 void *__lwt_stack_get(void);
 void __lwt_stack_return(void *stk);
+//void *__lwt_queue_get(void);
+//void __lwt_queue_return(void *lwt);
 /*
  * auto-increment counter for thread
  */
@@ -19,22 +21,38 @@ uint lwt_counter = 0;
 /*
  * counter for runable thread
  */
-uint runable_counter;
+uint runable_counter = 0;
 
 /*
  * counter for blocked thread
  */
-uint blocked_counter;
+uint blocked_counter = 0;
 
 /*
  * counter for died thread
  */
-uint died_counter;
+uint died_counter = 0;
+
+/*
+ * counter for available thread
+ */
+uint avail_counter = 0;
+
+/*
+ * pool lwt  head
+ */
+lwt_t pool_head;
+
+/*
+ * tail pool of lwt
+ */
+lwt_t pool_tail;
 
 /*
  * head of the queue of  thread
  */
 lwt_t lwt_head;
+struct _lwt_t init_head;
 
 /*
  *tail of the queue of thread
@@ -54,17 +72,17 @@ lwt_t lwt_des;
 /*
  * head of the queue of stack
  */
-stack_t stack_head = NULL;
+//stack_t stack_head = NULL;
 
 /*
  * tail node of the queue of stack
  */
-stack_t stack_tail = NULL;
+//stack_t stack_tail = NULL;
 
 /*
  * number of available stack in the queue
  */
-ulong stack_counter = 0;
+//ulong stack_counter = 0;
 
 lwt_t lwt_create(lwt_fn_t fn, void *data)
 {
@@ -75,18 +93,18 @@ lwt_t lwt_create(lwt_fn_t fn, void *data)
 	 */
 	if (lwt_head == LWT_NULL)
 	{
-		lwt_head = (lwt_t)malloc(sizeof(struct _lwt_t));
+		lwt_head = &init_head;
 		lwt_head->ip = (ulong)0;
 		lwt_head->sp = (ulong)NULL;
 
-		stack_head = malloc(sizeof(struct _stack_t));
+/*		stack_head = malloc(sizeof(struct _stack_t));
 		stack_head->bsp =  (ulong) NULL ;	//be used to free the stack
 		stack_head->flag = 1;
 		stack_tail = stack_head;
-		stack_head->next = NULL;
+		stack_head->next = NULL;*/
 
-		lwt_head->stack = stack_head;
-
+//		lwt_head->stack = stack_head;
+		lwt_head->bsp = (ulong)NULL;
 		lwt_head->id = lwt_counter++;
 		lwt_curr = lwt_head;
 		lwt_curr->status = LWT_ACTIVE;
@@ -97,11 +115,12 @@ lwt_t lwt_create(lwt_fn_t fn, void *data)
 	//malloc the new thread and stack
 
 
-	lwt_new = (lwt_t)malloc(sizeof(struct _lwt_t));
+	lwt_new = __lwt_stack_get();
 	lwt_new->id = lwt_counter++;
 	lwt_new->ip = (ulong) (&__lwt_start);
-	lwt_new->stack = __lwt_stack_get();
-	lwt_new->sp = lwt_new->stack->bsp + STACK_SIZE - 4; 		
+//	lwt_new->stack = __lwt_stack_get();
+//	lwt_new->sp = lwt_new->stack->bsp + STACK_SIZE - 4; 		
+	lwt_new->sp = lwt_new->bsp + STACK_SIZE - 4; 		
 	lwt_new->status = LWT_ACTIVE;
 	lwt_new->joiner = LWT_NULL; 
 	lwt_new->fn = fn;
@@ -113,7 +132,7 @@ lwt_t lwt_create(lwt_fn_t fn, void *data)
 #ifdef __DEBUG
 	lwt_t tmp = lwt_head;
 
-	while(tmp->next != NULL)
+	while(tmp != NULL)
 	{
 		printf("[create]temp id = %d, status = %d, ip = %d, sp = %d\n",tmp->id,tmp->status,tmp->ip,tmp->sp);
 		tmp = tmp->next;
@@ -142,12 +161,14 @@ void *lwt_join(lwt_t lwt)
 	}
 	else
 	{*/
+
 	lwt_curr->joiner = lwt;
 	lwt->target = lwt_curr;
 //	}
 
 	if(lwt->status != LWT_DEAD)
 	{
+
 #ifdef _DEBUG
 		printf("lwt_curr id = %d\n",lwt_curr->id);
 		printf("lwt_curr status = %d\n",lwt_curr->status);
@@ -365,7 +386,7 @@ DEBUG();
 
 	lwt_t tmp = lwt_head;
 
-	while(tmp->next != NULL)
+	while(tmp != NULL)
 	{
 		printf("temp id = %d, status = %d, ip = %d, sp = %d\n",tmp->id,tmp->status,tmp->ip,tmp->sp);
 		tmp = tmp->next;
@@ -432,8 +453,8 @@ DEBUG();
 #endif
 	return;	
 }
-
-/*void __lwt_dispatch(lwt_t curr, lwt_t next)	
+/*
+static inline void __lwt_dispatch(lwt_t curr, lwt_t next)	
 {
 	__asm__ __volatile__(	
 			"pushal\n\t" 						//PUSH ALL other register
@@ -460,7 +481,7 @@ void enqueue(lwt_t lwt)
 void* dequeue(lwt_t lwt)
 {
 	void * temp_data;
-	__lwt_stack_return(lwt->stack);
+//	__lwt_stack_return(lwt->stack);
 //	free((void *)lwt->bsp);
 	lwt->prev->next = lwt->next;
 	if(lwt->next != LWT_NULL)
@@ -468,11 +489,11 @@ void* dequeue(lwt_t lwt)
 	else
 		lwt_tail = lwt->prev;
 	temp_data = lwt->return_val;
-	free(lwt);
+	__lwt_stack_return(lwt);
 	return temp_data;
 }
 
-void *__lwt_stack_get()
+/*void *__lwt_stack_get()
 {
 
 	if(stack_counter == 0)
@@ -501,4 +522,42 @@ void __lwt_stack_return(void *stk)
 	stack_t tmp = (stack_t) stk;
 	stack_counter++;
 	tmp->flag = 0;
+}*/
+
+void *__lwt_stack_get()
+{
+
+	if(avail_counter == 0)
+	{
+//		printf("malloc\n");
+		pool_head = malloc(sizeof(struct _lwt_t));
+		pool_head->bsp = (ulong) (malloc(STACK_SIZE)) ;	//be used to free the stack
+		pool_head->next =NULL;
+		lwt_t tmp = pool_head;
+		pool_head = pool_head->next; 
+		pool_tail = pool_head;
+		return tmp;
+	}
+	else
+	{
+		lwt_t tmp = pool_head;		
+		pool_head = pool_head->next;
+		avail_counter--;
+		return tmp;
+	}	
+}
+void __lwt_stack_return(void *lwt)
+{
+	lwt_t tmp = (lwt_t *)lwt;
+	if(avail_counter == 0)
+	{
+		pool_head = tmp;
+		pool_tail = tmp;
+	}
+	{
+		pool_tail->next = tmp;
+		pool_tail = pool_tail->next;
+	}
+	pool_tail->next = NULL;
+	avail_counter++;
 }

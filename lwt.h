@@ -27,21 +27,22 @@ typedef enum
 {
 	LWT_ACTIVE,
 	LWT_BLOCKED,
-	LWT_DEAD
+	LWT_DEAD,
 }lwt_status_t;
-
+/*
 typedef struct _stack_t
 {
 	ulong bsp;	//the base of the stack pointer
 	uchar flag;	//0 is free, 1 is busy;
 	struct _stack_t *next;
-}*stack_t;
+}*stack_t;*/
 
 typedef struct _lwt_t
 {
 	ulong ip;
 	ulong sp;
-	stack_t stack;
+//	stack_t stack;
+	ulong bsp;
 	uint id;
 	lwt_status_t status;	
 	lwt_fn_t fn;
