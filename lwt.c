@@ -236,7 +236,8 @@ void lwt_die(void *data)
 	if(lwt_curr->target != LWT_NULL && lwt_curr->target->status == LWT_ACTIVE)
 		lwt_yield(lwt_curr->target);
 	else
-		lwt_yield(lwt_head);
+		//lwt_yield(lwt_head);
+		__lwt_schedule();
 //	lwt_yield(LWT_NULL);
 }
 
@@ -554,6 +555,7 @@ void __lwt_stack_return(void *lwt)
 		pool_head = tmp;
 		pool_tail = tmp;
 	}
+	else
 	{
 		pool_tail->next = tmp;
 		pool_tail = pool_tail->next;
