@@ -1,13 +1,17 @@
+#include"ps_list.h"
+
 #ifndef _LWT_H
 #define _LWT_H
 
 //#define __DEBUG
 
-#ifdef __DEBUG
 #define DEBUG(format,...) printf("[DEBUG INFO]: FILE %s, LINE %d"format"\n",__FILE__,__LINE__, ##__VA_ARGS__)
-#endif
+#ifdef __DEBUG
 
+#endif
+#ifndef STACK_SIZE
 #define STACK_SIZE 4096
+#endif
 
 #define LWT_NULL NULL
 
@@ -50,10 +54,36 @@ typedef struct _lwt_t
 	void *return_val;
 	struct _lwt_t *joiner;
 	struct _lwt_t *target;
-	struct _lwt_t *next;
-	struct _lwt_t *prev;
+	struct ps_list list;
 }*lwt_t;
 
+typedef struct _global_counter_t
+{
+	/*
+ 	* auto-increment counter for thread
+ 	*/
+	uint lwt_count;	
+	
+	/*
+ 	* counter for runable thread
+ 	*/
+	uint runable_counter;
+
+	/*
+ 	* counter for blocked thread
+ 	*/
+	uint blocked_counter;
+
+	/*
+ 	* counter for died thread
+	*/
+	uint died_counter;
+
+	/*
+ 	* counter for available thread
+	*/
+	uint avail_counter;
+}global_counter_t;
 
 lwt_t lwt_create(lwt_fn_t fn, void *data);
 void *lwt_join(lwt_t thread);

@@ -103,7 +103,7 @@ test_perf(void)
 	lwt_join(chld1);
 	lwt_join(chld2);
 
-//	printf("run = %d,blocked = %d,died = %d\n", lwt_info(LWT_INFO_NTHD_RUNNABLE),lwt_info(LWT_INFO_NTHD_BLOCKED),lwt_info(LWT_INFO_NTHD_ZOMBIES));
+	//printf("run = %d,blocked = %d,died = %d\n", lwt_info(LWT_INFO_NTHD_RUNNABLE),lwt_info(LWT_INFO_NTHD_BLOCKED),lwt_info(LWT_INFO_NTHD_ZOMBIES));
 	IS_RESET();
 }
 

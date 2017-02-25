@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<assert.h>
 //#include"lwt_dispatch.h"
 #include"lwt.h"
 
@@ -7,36 +8,15 @@
 void __lwt_start();
 void __lwt_schedule(void);
 static inline void __lwt_dispatch(lwt_t curr, lwt_t next);	
-void enqueue(lwt_t lwt);
-void* dequeue(lwt_t lwt);
 void *__lwt_stack_get(void);
 void __lwt_stack_return(void *stk);
-//void *__lwt_queue_get(void);
-//void __lwt_queue_return(void *lwt);
-/*
- * auto-increment counter for thread
- */
-uint lwt_counter = 0;	
+void __init_counter(void);
+void __init_thread_head(void);
+void __init_pool(void);
+void* __get_space_from_pool(int space_size);
 
-/*
- * counter for runable thread
- */
-uint runable_counter = 0;
 
-/*
- * counter for blocked thread
- */
-uint blocked_counter = 0;
-
-/*
- * counter for died thread
- */
-uint died_counter = 0;
-
-/*
- * counter for available thread
- */
-uint avail_counter = 0;
+global_counter_t gcounter;
 
 /*
  * pool lwt  head
@@ -49,10 +29,19 @@ lwt_t pool_head;
 lwt_t pool_tail;
 
 /*
+ * the pointer of the free pool
+ */
+void *pool;
+
+/*
+ * the number of free space in the pool
+ */
+uchar rest_pool;
+
+/*
  * head of the queue of  thread
  */
 lwt_t lwt_head;
-struct _lwt_t init_head;
 
 /*
  *tail of the queue of thread
@@ -69,54 +58,66 @@ lwt_t lwt_curr;
  */
 lwt_t lwt_des;
 
-/*
- * head of the queue of stack
- */
-//stack_t stack_head = NULL;
 
-/*
- * tail node of the queue of stack
- */
-//stack_t stack_tail = NULL;
+__attribute__((constructor())) void 
+__init()  
+{  
+	__init_counter();
+	__init_pool();
+	__init_thread_head();
 
-/*
- * number of available stack in the queue
- */
-//ulong stack_counter = 0;
+}  	
 
-lwt_t lwt_create(lwt_fn_t fn, void *data)
+void
+__init_counter()
+{
+    gcounter.lwt_count = 0;
+	gcounter.runable_counter = 0;
+	gcounter.blocked_counter = 0;
+	gcounter.died_counter = 0;
+	gcounter.avail_counter = 0;
+}
+
+void
+__init_thread_head()
+{
+
+	lwt_head = __lwt_stack_get();
+	ps_list_init_d(lwt_head);
+
+	lwt_head->ip = (ulong)0;
+	lwt_head->sp = (ulong)NULL;
+
+	lwt_head->bsp = (ulong)NULL;
+	lwt_head->id = gcounter.lwt_count++;
+	lwt_curr = lwt_head;
+	lwt_curr->status = LWT_ACTIVE;
+	gcounter.runable_counter++;
+	lwt_tail = lwt_head;
+
+}
+
+void
+__init_pool()
+{
+	rest_pool = 20;
+	pool =  malloc((sizeof(struct _lwt_t ) + STACK_SIZE) * rest_pool);
+}
+
+lwt_t 
+lwt_create(lwt_fn_t fn, void *data)
 {
 
 	lwt_t lwt_new;
-	/*
-	 * if current thread is NULL, make the new thread be the head
-	 */
-	if (lwt_head == LWT_NULL)
-	{
-		lwt_head = &init_head;
-		lwt_head->ip = (ulong)0;
-		lwt_head->sp = (ulong)NULL;
 
-/*		stack_head = malloc(sizeof(struct _stack_t));
-		stack_head->bsp =  (ulong) NULL ;	//be used to free the stack
-		stack_head->flag = 1;
-		stack_tail = stack_head;
-		stack_head->next = NULL;*/
-
-//		lwt_head->stack = stack_head;
-		lwt_head->bsp = (ulong)NULL;
-		lwt_head->id = lwt_counter++;
-		lwt_curr = lwt_head;
-		lwt_curr->status = LWT_ACTIVE;
-		runable_counter++;
-		lwt_tail = lwt_head;
-	}
+	assert(fn);
 	
 	//malloc the new thread and stack
 
 
 	lwt_new = __lwt_stack_get();
-	lwt_new->id = lwt_counter++;
+
+	lwt_new->id = gcounter.lwt_count++;
 	lwt_new->ip = (ulong) (&__lwt_start);
 //	lwt_new->stack = __lwt_stack_get();
 //	lwt_new->sp = lwt_new->stack->bsp + STACK_SIZE - 4; 		
@@ -125,88 +126,53 @@ lwt_t lwt_create(lwt_fn_t fn, void *data)
 	lwt_new->joiner = LWT_NULL; 
 	lwt_new->fn = fn;
 	lwt_new->data = data;
-	runable_counter++;
+	gcounter.runable_counter++;
 	//lwt_des = lwt_new;
 	
-	enqueue(lwt_new);	
-#ifdef __DEBUG
-	lwt_t tmp = lwt_head;
+	ps_list_add_d(lwt_tail,lwt_new);
 
-	while(tmp != NULL)
-	{
-		printf("[create]temp id = %d, status = %d, ip = %d, sp = %d\n",tmp->id,tmp->status,tmp->ip,tmp->sp);
-		tmp = tmp->next;
-	}
-#endif
+	lwt_tail = lwt_new;
 	return lwt_new;
 }
 
-void *lwt_join(lwt_t lwt)
-{
-#ifdef __DEBUG
-//	DEBUG();
-#endif
-
+void*
+lwt_join(lwt_t lwt)
+{	
 	void *temp_data;
-/*	if(lwt_curr->status == LWT_DEAD)
-	{
-		lwt->target = LWT_NULL;
-	}
-	else
-	{*/
-/*	if(lwt_curr->status != LWT_ACTIVE)
-	{
-		lwt_head->joiner = lwt;
-		lwt->target = lwt_head;
-	}
-	else
-	{*/
+
+	assert(lwt);
 
 	lwt_curr->joiner = lwt;
 	lwt->target = lwt_curr;
-//	}
 
 	if(lwt->status != LWT_DEAD)
 	{
 
-#ifdef _DEBUG
-		printf("lwt_curr id = %d\n",lwt_curr->id);
-		printf("lwt_curr status = %d\n",lwt_curr->status);
-		printf("lwt id = %d\n",lwt->id);
-		printf("lwt status = %d\n",lwt->status);
-#endif	
 		lwt_curr->status = LWT_BLOCKED;
-		blocked_counter++;
-		runable_counter--;
+		gcounter.blocked_counter++;
+		gcounter.runable_counter--;
 		lwt_yield(lwt);
-	//	if(lwt_curr->status = LWT_DEAD)
-	//		lwt_curr = lwt_head;
 	}
 
-	temp_data = dequeue(lwt);
-	died_counter--;
-/*	//free stack
-	free(lwt->bsp);
-	lwt->prev->next = lwt->next;
-
-	//remove lwt from linked list
-	if (lwt->next == NULL)
-		lwt_tail = lwt->prev;
-	else
-		lwt->next->prev = lwt->prev;
-	died_counter--;
-	//free lwt
 	temp_data = lwt->return_val;
-	free(lwt);*/
+
+	if(lwt_tail == lwt)	
+		lwt_tail = ps_list_prev_d(lwt_tail);
+	ps_list_rem_d(lwt);
+	__lwt_stack_return(lwt);
+	
+
+
+	gcounter.died_counter--;
+
 	return temp_data;
 
 }
 
-void lwt_die(void *data)
+void
+lwt_die(void *data)
 {	
-#ifdef __DEBUG
-	DEBUG();
-#endif
+
 	/*
 	 * if the current thread is the joiner of a specific thread,
 	 * set this blocked thread active
@@ -216,9 +182,9 @@ void lwt_die(void *data)
 	{
 		if(lwt_curr->target->status == LWT_BLOCKED)
 		{
-			blocked_counter--;
+			gcounter.blocked_counter--;
 			lwt_curr->target->status = LWT_ACTIVE;
-			runable_counter++;
+			gcounter.runable_counter++;
 		}
 	}
 	
@@ -227,63 +193,46 @@ void lwt_die(void *data)
 
 	lwt_curr->return_val = (void *)data;
 
-	runable_counter--;
+	gcounter.runable_counter--;
 
-	died_counter++;
-#ifdef __DEBUG
-	DEBUG();
-#endif
+	gcounter.died_counter++;
+
 	if(lwt_curr->target != LWT_NULL && lwt_curr->target->status == LWT_ACTIVE)
+	{
 		lwt_yield(lwt_curr->target);
+	}	
+
 	else
-		//lwt_yield(lwt_head);
+	{
 		__lwt_schedule();
+	}
+		//lwt_yield(lwt_head);
+
 //	lwt_yield(LWT_NULL);
 }
 
-int lwt_yield(lwt_t lwt)
+int
+lwt_yield(lwt_t lwt)
 {
-#ifdef __DEBUG
-	DEBUG();	
 
-#endif
 	if(lwt == NULL)
 	{
-#ifdef __DEBUG
-		DEBUG();
-#endif
 		__lwt_schedule();
 	
 	}
 	else if (lwt->status == LWT_ACTIVE)
 	{
 		lwt_des = lwt;
-		
-#ifdef __DEBUG
-//	DEBUG();
-//	printf("lwt id = %d,status = %d, ip = %d, sp = %d\n",lwt->id,lwt->status,lwt->ip,lwt->sp);
-//	printf("cur id = %d, ip = %d, sp = %d\n",lwt_curr->id,lwt_curr->ip,lwt_curr->sp);
-//	printf("des id = %d, ip = %d, sp = %d\n",lwt_des->id,lwt_des->ip,lwt_des->sp);
-#endif
-		lwt_t tmp_curr = lwt_curr;
+				lwt_t tmp_curr = lwt_curr;
 		lwt_curr = lwt_des;
 		__lwt_dispatch(/*(struct lwt_context *)*/tmp_curr,/*(struct lwt_context *)*/lwt_des);
 	}
-#ifdef __DEBUG
-	else 
-	{
-		printf("status = %d\n",lwt->status);
-		printf("head status = %d\n",lwt_head->status);
-	}
-#endif
 	return -1;
 }
 
-lwt_t lwt_current(void)
+lwt_t
+lwt_current(void)
 {
-#ifdef __DEBUG
-//	DEBUG();
-#endif
 	return lwt_curr;
 }
 
@@ -291,14 +240,15 @@ lwt_t lwt_current(void)
  * gets the thread id of a specified thread.
  * returns -1 if the thread not exists
  */
-int lwt_id(lwt_t lwt)
+int 
+lwt_id(lwt_t lwt)
 {
-#ifdef __DEBUG
-//	DEBUG();
-#endif
+	assert(lwt);
+
 	if (!lwt)
+	{
 		return -1;
-	
+	}
 	return lwt->id;
 }
 
@@ -307,136 +257,53 @@ int lwt_id(lwt_t lwt)
  * blocked (i.e. that are joining, on a lwt that hasn't died),
  *  or that have died
  */
-int lwt_info(lwt_info_t t)
+int
+lwt_info(lwt_info_t t)
 {
-#ifdef __DEBUG
-//	DEBUG();
-#endif
 	switch (t) {
 		case LWT_INFO_NTHD_RUNNABLE:
-			return runable_counter;
+			return gcounter.runable_counter;
 		case LWT_INFO_NTHD_BLOCKED:
-			return blocked_counter;
+			return gcounter.blocked_counter;
 		case LWT_INFO_NTHD_ZOMBIES:
 		default:
-			return died_counter;							
+			return gcounter.died_counter;							
 	}
 }
 
 
-void __lwt_start()
+void 
+__lwt_start()
 {
-#ifdef __DEBUG
-	DEBUG();
-	printf("data = %d\n",lwt_curr->data);
-#endif
-//	lwt_curr = lwt_des;
 		
 	void *return_val = lwt_curr->fn(lwt_curr->data);
-#ifdef __DEBUG
-	DEBUG();
-#endif
 	lwt_die(return_val);
 
-#ifdef __DEBUG
-//	DEBUG();
-#endif
 }
 
-void __lwt_schedule(void)
+void
+__lwt_schedule(void)
 {
 	lwt_t temp;
 
-#ifdef __DEBUG
-	printf("runable = %d\n",runable_counter);
-#endif	
 	//prevent directly yield()
 	if (lwt_info(LWT_INFO_NTHD_RUNNABLE) == 0)
 	{
 		return;
 	}
-	
-#ifdef __DEBUG
-DEBUG();
-#endif
+		
 	if(lwt_curr != lwt_head && lwt_curr != lwt_tail)
 	{		
-		lwt_curr->next->prev = lwt_curr->prev;
-		lwt_curr->prev->next = lwt_curr->next;
-		lwt_tail->next = lwt_curr;
-		lwt_curr->prev = lwt_tail;
-		lwt_curr->next = NULL;
+		ps_list_rem_d(lwt_curr);
+		ps_list_add_d(lwt_tail,lwt_curr);
 		lwt_tail = lwt_curr;
-	}
-/*	//get next ACTIVE thread
-	if (lwt_head->next != LWT_NULL) 
-	{
-		temp = lwt_head->next;
-	} 
-	else 
-	{
-#ifdef __DEBUG
-	//	printf("thread4 id = %d, ip = %d, sp = %d\n",lwt_curr->prev->id,lwt_curr->prev->ip,lwt_curr->prev->sp);
-	DEBUG();
-#endif
-
-		temp = lwt_head;
-	}*/
-#ifdef __DEBUG
-DEBUG();
-
-	lwt_t tmp = lwt_head;
-
-	while(tmp != NULL)
-	{
-		printf("temp id = %d, status = %d, ip = %d, sp = %d\n",tmp->id,tmp->status,tmp->ip,tmp->sp);
-		tmp = tmp->next;
-	}
-#endif
-/*	while (temp->status != LWT_ACTIVE)
-	{
-		if (temp->next != NULL)
-		{
-			temp = temp->next;
-		}
-		else 
-		{
-			temp = lwt_head;
-		}
-		//printf("temp id = %d, status = %d, ip = %d, sp = %d\n",temp->id,temp->status,temp->ip,temp->sp);
-	}*/
-
-/*	while(temp != lwt_head)// && (temp->status != LWT_ACTIVE ||  temp == lwt_curr))
-	{
-		if(temp != lwt_curr && temp->status == LWT_ACTIVE)
-			break;
-		if(temp->next != NULL)
-		{
-			temp = temp->next;
-		}
-		else
-		{
-			temp = lwt_head;
-		}
-//		printf("temp id = %d, status = %d, next = %d\n",temp->id,temp->status,temp->next->id);
-	}*/
+	}                              	
 
 	temp = lwt_head;
 	while(temp->status != LWT_ACTIVE)
 	{
-		temp = temp->next;
+		temp = ps_list_next_d(temp);
 	}
-/*	if(temp->status != LWT_ACTIVE)
-	{
-		temp = lwt_curr;
-	}*/
-#ifdef __DEBUG
-
-	printf("des id = %d, status = %d, ip = %d, sp = %d\n",temp->id,temp->status,temp->ip,temp->sp);
-	printf("head id = %d, status = %d, ip = %d, sp = %d\n",lwt_head->id,lwt_head->status,lwt_head->ip,lwt_head->sp);
-	
-	printf("curr id = %d, status = %d, ip = %d, sp = %d\n",lwt_curr->id,lwt_curr->status,lwt_curr->ip,lwt_curr->sp);
-#endif
 
 	if (temp != lwt_curr)
 	{
@@ -445,17 +312,13 @@ DEBUG();
 		lwt_t tmp_curr = lwt_curr;
 		lwt_curr = lwt_des;
 		__lwt_dispatch(/*(struct lwt_context *)*/tmp_curr, /*(struct lwt_context *)*/lwt_des);
-#ifdef _DEBUG
-	DEBUG();
-#endif
+
 	}
-#ifdef __DEBUG
-	DEBUG();
-#endif
 	return;	
 }
 
-static inline void __lwt_dispatch(lwt_t curr, lwt_t next)	
+static inline void 
+__lwt_dispatch(lwt_t curr, lwt_t next)	
 {
 	__asm__ __volatile__(	
 			"pushal\n\t" 						//PUSH ALL other register
@@ -471,95 +334,67 @@ static inline void __lwt_dispatch(lwt_t curr, lwt_t next)
 
 	return;	
 }
-void enqueue(lwt_t lwt)
-{
-	lwt->next = NULL;
-	lwt->prev = lwt_tail;
-	lwt_tail->next = lwt;
-	lwt_tail = lwt;
-}
 
-void* dequeue(lwt_t lwt)
-{
-	void * temp_data;
-//	__lwt_stack_return(lwt->stack);
-//	free((void *)lwt->bsp);
-	lwt->prev->next = lwt->next;
-	if(lwt->next != LWT_NULL)
-		lwt->next->prev = lwt->prev;
-	else
-		lwt_tail = lwt->prev;
-	temp_data = lwt->return_val;
-	__lwt_stack_return(lwt);
-	return temp_data;
-}
-
-/*void *__lwt_stack_get()
+void 
+*__lwt_stack_get()
 {
 
-	if(stack_counter == 0)
+	if(gcounter.avail_counter == 0)
 	{
-		stack_tail->next = malloc(sizeof(struct _stack_t));
-		stack_tail = stack_tail->next;
-		stack_tail->next = NULL;
-		stack_tail->bsp =  (ulong) (malloc(STACK_SIZE)) ;	//be used to free the stack
-		stack_tail->flag = 1;
-		return stack_tail;
-	}
-	else
-	{
-		stack_t tmp = stack_head;		
-		while(tmp->flag != 0)
-		{
-			tmp = tmp->next;
+		if(rest_pool > 0)
+		{	
+			pool_head = __get_space_from_pool(sizeof(struct _lwt_t));
+			pool_head->bsp = (ulong) __get_space_from_pool(STACK_SIZE);
+			rest_pool--;
 		}
-		tmp->flag = 1;
-		stack_counter--;
-		return tmp;
-	}	
-}
-void __lwt_stack_return(void *stk)
-{
-	stack_t tmp = (stack_t) stk;
-	stack_counter++;
-	tmp->flag = 0;
-}*/
+		else
+		{
+			pool_head = malloc(sizeof(struct _lwt_t));
+			pool_head->bsp = (ulong) (malloc(STACK_SIZE)) ;	//be used to free the stack
+		}
 
-void *__lwt_stack_get()
-{
-
-	if(avail_counter == 0)
-	{
-//		printf("malloc\n");
-		pool_head = malloc(sizeof(struct _lwt_t));
-		pool_head->bsp = (ulong) (malloc(STACK_SIZE)) ;	//be used to free the stack
-		pool_head->next =NULL;
-		lwt_t tmp = pool_head;
-		pool_head = pool_head->next; 
-		pool_tail = pool_head;
-		return tmp;
+		return pool_head;
 	}
 	else
 	{
 		lwt_t tmp = pool_head;		
-		pool_head = pool_head->next;
-		avail_counter--;
+		pool_head = ps_list_next_d(pool_head);
+		ps_list_rem_d(tmp);
+		gcounter.avail_counter--;
 		return tmp;
 	}	
 }
-void __lwt_stack_return(void *lwt)
+
+void 
+__lwt_stack_return(void *lwt)
 {
-	lwt_t tmp = (lwt_t *)lwt;
-	if(avail_counter == 0)
+	assert(lwt);
+
+	lwt_t tmp = lwt;
+
+	if(gcounter.avail_counter == 0)
 	{
+		ps_list_init_d(tmp);
 		pool_head = tmp;
 		pool_tail = tmp;
 	}
 	else
 	{
-		pool_tail->next = tmp;
-		pool_tail = pool_tail->next;
+		ps_list_add_d(pool_tail,tmp);		
+		pool_tail = tmp;
 	}
-	pool_tail->next = NULL;
-	avail_counter++;
+
+	gcounter.avail_counter++;
 }
+
+void
+*__get_space_from_pool(int space_size)
+{
+	assert(rest_pool > 0);
+
+	void *tmp = pool;
+	pool = pool + space_size;
+	return (void *)tmp;
+}
+
+

@@ -14,7 +14,7 @@ LWT_DISPATCH_H	lwt_dispatch.h	2;"	d
 LWT_INFO_NTHD_BLOCKED	lwt.h	/^	LWT_INFO_NTHD_BLOCKED,$/;"	e	enum:__anon1
 LWT_INFO_NTHD_RUNNABLE	lwt.h	/^	LWT_INFO_NTHD_RUNNABLE,$/;"	e	enum:__anon1
 LWT_INFO_NTHD_ZOMBIES	lwt.h	/^	LWT_INFO_NTHD_ZOMBIES$/;"	e	enum:__anon1
-LWT_NULL	lwt.h	12;"	d
+LWT_NULL	lwt.h	13;"	d
 STACK_SIZE	lwt.h	10;"	d
 _LWT_H	lwt.h	2;"	d
 __lwt_dispatch	lwt.c	/^static inline void __lwt_dispatch(lwt_t curr, lwt_t next)	$/;"	f	file:
@@ -22,14 +22,15 @@ __lwt_schedule	lwt.c	/^void __lwt_schedule(void)$/;"	f
 __lwt_stack_get	lwt.c	/^void *__lwt_stack_get()$/;"	f
 __lwt_stack_return	lwt.c	/^void __lwt_stack_return(void *lwt)$/;"	f
 __lwt_start	lwt.c	/^void __lwt_start()$/;"	f
+_global_counter_t	lwt.h	/^typedef struct _global_counter_t$/;"	s
 _lwt_t	lwt.h	/^typedef struct _lwt_t$/;"	s
-avail_counter	lwt.c	/^uint avail_counter = 0;$/;"	v
-blocked_counter	lwt.c	/^uint blocked_counter = 0;$/;"	v
+avail_counter	lwt.h	/^	uint avail_counter = 0;$/;"	m	struct:_global_counter_t
+blocked_counter	lwt.h	/^	uint blocked_counter = 0;$/;"	m	struct:_global_counter_t
 bsp	lwt.h	/^	ulong bsp;$/;"	m	struct:_lwt_t
 curr	main.c	/^volatile int curr = 0;$/;"	v
 data	lwt.h	/^	void *data;$/;"	m	struct:_lwt_t
 dequeue	lwt.c	/^void* dequeue(lwt_t lwt)$/;"	f
-died_counter	lwt.c	/^uint died_counter = 0;$/;"	v
+died_counter	lwt.h	/^	uint died_counter = 0;$/;"	m	struct:_global_counter_t
 enqueue	lwt.c	/^void enqueue(lwt_t lwt)$/;"	f
 flag	test.c	/^int flag=0;$/;"	v
 fn	lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:_lwt_t
@@ -39,13 +40,16 @@ fn_join	main.c	/^fn_join(void *d)$/;"	f
 fn_nested_joins	main.c	/^fn_nested_joins(void *d)$/;"	f
 fn_null	main.c	/^fn_null(void *d)$/;"	f
 fn_sequence	main.c	/^fn_sequence(void *d)$/;"	f
+gcounter	lwt.c	/^global_counter_t gcounter;$/;"	v
+global_counter_t	lwt.h	/^}global_counter_t;$/;"	t	typeref:struct:_global_counter_t
 id	lwt.h	/^	uint id;$/;"	m	struct:_lwt_t
 init_head	lwt.c	/^struct _lwt_t init_head;$/;"	v	typeref:struct:_lwt_t
+init_pool	lwt.c	/^__attribute__((constructor())) void init_pool()  $/;"	f
 ip	lwt.h	/^	ulong ip;$/;"	m	struct:_lwt_t
 ip	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
 joiner	lwt.h	/^	struct _lwt_t *joiner;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
 lwt_context	lwt_dispatch.h	/^struct lwt_context {$/;"	s
-lwt_counter	lwt.c	/^uint lwt_counter = 0;	$/;"	v
+lwt_count	lwt.h	/^	uint lwt_count = 0;	$/;"	m	struct:_global_counter_t
 lwt_create	lwt.c	/^lwt_t lwt_create(lwt_fn_t fn, void *data)$/;"	f
 lwt_curr	lwt.c	/^lwt_t lwt_curr;$/;"	v
 lwt_current	lwt.c	/^lwt_t lwt_current(void)$/;"	f
@@ -70,7 +74,7 @@ pool_tail	lwt.c	/^lwt_t pool_tail;$/;"	v
 prev	lwt.h	/^	struct _lwt_t *prev;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
 rdtscll	main.c	7;"	d	file:
 return_val	lwt.h	/^	void *return_val;$/;"	m	struct:_lwt_t
-runable_counter	lwt.c	/^uint runable_counter = 0;$/;"	v
+runable_counter	lwt.h	/^	uint runable_counter = 0;$/;"	m	struct:_global_counter_t
 sched	main.c	/^volatile int sched[2] = {0, 0};$/;"	v
 sp	lwt.h	/^	ulong sp;$/;"	m	struct:_lwt_t
 sp	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
