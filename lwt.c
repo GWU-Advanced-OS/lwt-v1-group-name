@@ -16,7 +16,7 @@ void __init_pool(void);
 void* __get_space_from_pool(int space_size);
 
 
-global_counter_t gcounter;
+
 
 /*
  * pool lwt  head
@@ -38,27 +38,6 @@ void *pool;
  */
 uchar rest_pool;
 
-/*
- * head of the queue of  thread
- */
-lwt_t lwt_head;
-
-/*
- *tail of the queue of thread
- */
-lwt_t lwt_tail;
-
-/*
- * current thread
- */
-lwt_t lwt_curr;
-
-/*
- * the destination thread which is going to be operated
- */
-lwt_t lwt_des;
-
-
 __attribute__((constructor())) void 
 __init()  
 {  
@@ -76,6 +55,9 @@ __init_counter()
 	gcounter.blocked_counter = 0;
 	gcounter.died_counter = 0;
 	gcounter.avail_counter = 0;
+	gcounter.nchan_counter = 0;	
+	gcounter.nsnding_counter = 0;
+	gcounter.nrcving_counter = 0;
 }
 
 void
@@ -90,6 +72,8 @@ __init_thread_head()
 
 	lwt_head->bsp = (ulong)NULL;
 	lwt_head->id = gcounter.lwt_count++;
+
+	lwt_head->ifrecycled = 0;
 	lwt_curr = lwt_head;
 	lwt_curr->status = LWT_ACTIVE;
 	gcounter.runable_counter++;
@@ -126,6 +110,7 @@ lwt_create(lwt_fn_t fn, void *data)
 	lwt_new->joiner = LWT_NULL; 
 	lwt_new->fn = fn;
 	lwt_new->data = data;
+	lwt_new->ifrecycled = 0;
 	gcounter.runable_counter++;
 	//lwt_des = lwt_new;
 	
@@ -147,23 +132,20 @@ lwt_join(lwt_t lwt)
 
 	if(lwt->status != LWT_DEAD)
 	{
-
 		lwt_curr->status = LWT_BLOCKED;
 		gcounter.blocked_counter++;
 		gcounter.runable_counter--;
 		lwt_yield(lwt);
 	}
-
-	temp_data = lwt->return_val;
-
-	if(lwt_tail == lwt)	
-		lwt_tail = ps_list_prev_d(lwt_tail);
-	ps_list_rem_d(lwt);
-	__lwt_stack_return(lwt);
-	
-
-
-	gcounter.died_counter--;
+	if(!lwt->ifrecycled)
+	{
+		temp_data = lwt->return_val;
+		if(lwt_tail == lwt)	
+			lwt_tail = ps_list_prev_d(lwt_tail);
+		ps_list_rem_d(lwt);
+		__lwt_stack_return(lwt);
+		gcounter.died_counter--;
+	}
 
 	return temp_data;
 
@@ -201,7 +183,6 @@ lwt_die(void *data)
 	{
 		lwt_yield(lwt_curr->target);
 	}	
-
 	else
 	{
 		__lwt_schedule();
@@ -214,7 +195,6 @@ lwt_die(void *data)
 int
 lwt_yield(lwt_t lwt)
 {
-
 	if(lwt == NULL)
 	{
 		__lwt_schedule();
@@ -222,6 +202,7 @@ lwt_yield(lwt_t lwt)
 	}
 	else if (lwt->status == LWT_ACTIVE)
 	{
+	//	lwt->status = LWT_ACTIVE;
 		lwt_des = lwt;
 				lwt_t tmp_curr = lwt_curr;
 		lwt_curr = lwt_des;
@@ -266,8 +247,14 @@ lwt_info(lwt_info_t t)
 		case LWT_INFO_NTHD_BLOCKED:
 			return gcounter.blocked_counter;
 		case LWT_INFO_NTHD_ZOMBIES:
-		default:
 			return gcounter.died_counter;							
+		case LWT_INFO_NCHAN:
+			return gcounter.nchan_counter;							
+		case LWT_INFO_NSNDING:
+			return gcounter.nsnding_counter;							
+		case LWT_INFO_NRCVING:
+			return gcounter.nrcving_counter;							
+
 	}
 }
 
@@ -292,14 +279,14 @@ __lwt_schedule(void)
 		return;
 	}
 		
-	if(lwt_curr != lwt_head && lwt_curr != lwt_tail)
+	if(lwt_curr != lwt_tail)
 	{		
 		ps_list_rem_d(lwt_curr);
 		ps_list_add_d(lwt_tail,lwt_curr);
 		lwt_tail = lwt_curr;
 	}                              	
 
-	temp = lwt_head;
+	temp = ps_list_next_d(lwt_tail);
 	while(temp->status != LWT_ACTIVE)
 	{
 		temp = ps_list_next_d(temp);
@@ -371,7 +358,8 @@ __lwt_stack_return(void *lwt)
 	assert(lwt);
 
 	lwt_t tmp = lwt;
-
+	tmp->ifrecycled = 1;
+	
 	if(gcounter.avail_counter == 0)
 	{
 		ps_list_init_d(tmp);

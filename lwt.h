@@ -1,5 +1,4 @@
 #include"ps_list.h"
-
 #ifndef _LWT_H
 #define _LWT_H
 
@@ -24,7 +23,10 @@ typedef void *(*lwt_fn_t) (void *);
 typedef enum {
 	LWT_INFO_NTHD_RUNNABLE,
 	LWT_INFO_NTHD_BLOCKED,
-	LWT_INFO_NTHD_ZOMBIES
+	LWT_INFO_NTHD_ZOMBIES,
+	LWT_INFO_NCHAN,
+	LWT_INFO_NSNDING,
+	LWT_INFO_NRCVING,
 } lwt_info_t;
 
 typedef enum
@@ -32,14 +34,8 @@ typedef enum
 	LWT_ACTIVE,
 	LWT_BLOCKED,
 	LWT_DEAD,
+	LWT_WAITING,
 }lwt_status_t;
-/*
-typedef struct _stack_t
-{
-	ulong bsp;	//the base of the stack pointer
-	uchar flag;	//0 is free, 1 is busy;
-	struct _stack_t *next;
-}*stack_t;*/
 
 typedef struct _lwt_t
 {
@@ -52,6 +48,7 @@ typedef struct _lwt_t
 	lwt_fn_t fn;
 	void *data;
 	void *return_val;
+	uchar ifrecycled;	//to identify if this lwt is now in the pool
 	struct _lwt_t *joiner;
 	struct _lwt_t *target;
 	struct ps_list list;
@@ -83,7 +80,44 @@ typedef struct _global_counter_t
  	* counter for available thread
 	*/
 	uint avail_counter;
+
+	/*
+	 * counter for number of channels that are active
+	 */
+	uint nchan_counter;
+
+	/*
+	 * (number of threads blocked sending on channels),
+	 */
+	uint nsnding_counter;
+
+	/*
+	 * (number of threads blocked receiving on channels),
+	 */
+	uint nrcving_counter;
 }global_counter_t;
+
+/*
+ * head of the queue of  thread
+ */
+lwt_t lwt_head;
+
+/*
+ *tail of the queue of thread
+ */
+lwt_t lwt_tail;
+
+/*
+ * current thread
+ */
+lwt_t lwt_curr;
+
+/*
+ * the destination thread which is going to be operated
+ */
+lwt_t lwt_des;
+
+global_counter_t gcounter;
 
 lwt_t lwt_create(lwt_fn_t fn, void *data);
 void *lwt_join(lwt_t thread);
@@ -92,4 +126,6 @@ int lwt_yield(lwt_t lwt);
 lwt_t lwt_current(void);
 int lwt_id(lwt_t lwt);
 int lwt_info(lwt_info_t t);
+void __lwt_start();
+void *__lwt_stack_get(void);
 #endif
