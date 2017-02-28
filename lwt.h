@@ -44,7 +44,7 @@ typedef struct _lwt_t
 //	stack_t stack;
 	ulong bsp;
 	uint id;
-	uint blocked;
+//	uint blocked;
 	lwt_status_t status;	
 	lwt_fn_t fn;
 	void *data;

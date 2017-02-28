@@ -22,7 +22,7 @@ typedef struct lwt_channel
 	clist_t snd_thds;			/* list of those threads */
 	clist_t tail_snd;
 	/* receiver’s data */
-	int rcv_blocked; 			/* if the receiver is blocked */
+//	int rcv_blocked; 			/* if the receiver is blocked */
 	lwt_t rcv_thd;	 			/* the receiver */
 } lwt_channel, *lwt_chan_t;
 

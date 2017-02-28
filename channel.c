@@ -60,9 +60,8 @@ lwt_chan(int sz)
 	new->id = nchan_num++;
 	gcounter.nchan_counter++;
 	new->snd_thds = NULL;
-	new->rcv_blocked = 0;
 	new->rcv_thd = lwt_curr;
-	new->rcv_thd->blocked = 0;
+//	new->rcv_thd->blocked = 0;
 	return new;
 }
 
@@ -116,14 +115,15 @@ lwt_snd(lwt_chan_t c, void *data)
 	//block current thread
 	gcounter.nsnding_counter++;
 
-	lwt_curr->blocked = 1;
+//	lwt_curr->blocked = 1;
+	lwt_curr->status = LWT_WAITING;
 
-	while (c->rcv_thd->blocked == 0) 
+	while (c->rcv_thd->status == LWT_ACTIVE)//blocked == 0) 
 	{
 		lwt_yield(LWT_NULL);
 	}
 
-	c->rcv_thd->blocked = 0;
+	c->rcv_thd->status = LWT_ACTIVE;//blocked = 0;
 	gcounter.nsnding_counter--;
 
 	
@@ -141,7 +141,7 @@ void
 		return NULL;
 	}
 	
-	c->rcv_thd->blocked = 1;
+	c->rcv_thd->status = LWT_WAITING;//blocked = 1;
 
 	gcounter.nrcving_counter++;
 	
@@ -164,7 +164,7 @@ void
 	c->snd_cnt--;
 	dequeue_snd(c);
 
-	c->rcv_thd->blocked = 0;
+	c->rcv_thd->status = LWT_ACTIVE;//blocked = 0;
 
 	return temp;
 }
@@ -189,7 +189,7 @@ lwt_snd_chan(lwt_chan_t c, lwt_chan_t sending)
 	sending->snd_cnt++;
 	enqueue_snd(sending, new_clist);
 	sending->rcv_thd = lwt_curr;
-	sending->rcv_blocked = 0;
+//	sending->rcv_blocked = 0;
 	
 
 	if (c->rcv_thd == NULL)
@@ -219,14 +219,14 @@ lwt_snd_chan(lwt_chan_t c, lwt_chan_t sending)
 	//block current thread
 	gcounter.nsnding_counter++;
 	
-	lwt_curr->blocked = 1;
-	while (c->rcv_thd->blocked == 0) 
+	lwt_curr->status = LWT_WAITING;//blocked = 1;
+	while (c->rcv_thd->status == LWT_ACTIVE)//blocked == 0) 
 	{
 		lwt_yield(LWT_NULL);
 			
 	}
 	
-	c->rcv_thd->blocked = 0;
+	c->rcv_thd->status = LWT_ACTIVE;//blocked = 0;
 	gcounter.nsnding_counter--;
 
 	
