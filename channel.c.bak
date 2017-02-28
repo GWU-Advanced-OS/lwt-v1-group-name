@@ -60,8 +60,8 @@ lwt_chan(int sz)
 	new->id = nchan_num++;
 	gcounter.nchan_counter++;
 	new->snd_thds = NULL;
-	new->rcv_blocked = 0;
 	new->rcv_thd = lwt_curr;
+//	new->rcv_thd->blocked = 0;
 	return new;
 }
 
@@ -73,7 +73,6 @@ lwt_chan(int sz)
 void 
 lwt_chan_deref(lwt_chan_t c)
 {
-	printf("num = %d\n",c->snd_cnt);
 	if (c->snd_thds == NULL && c->rcv_thd->status != LWT_WAITING) 
 	{
 		gcounter.nchan_counter--;
@@ -94,76 +93,37 @@ lwt_snd(lwt_chan_t c, void *data)
    	{
 		return -1;
 	}
-
+	
+	//if there is node that is new added without filling the data,fill it 
 	if(c->snd_thds != NULL && c->snd_thds->ifnew == 1)
 	{
-		DEBUG();
 		c->snd_thds->ifnew = 0;
 		c->snd_thds->data = data;
 	}	
 	else
 	{
-		DEBUG();
 		clist_t new_clist = (clist_t)malloc(sizeof(clist_head));
 		new_clist->thd = lwt_curr;
 		new_clist->data = data;
 		new_clist->ifnew = 0;
-		new_clist->ifchan = 0;
-		new_clist->snd_blocked = 0;
 		new_clist->next = NULL;
 
 		c->snd_cnt++;
 		enqueue_snd(c, new_clist);
 	}
 	
-	DEBUG();	
 	//block current thread
 	gcounter.nsnding_counter++;
-//	c->snd_thds->snd_blocked = 1
 
+//	lwt_curr->blocked = 1;
+	lwt_curr->status = LWT_WAITING;
 
-	if(c->snd_thds->ifchan == 1)
-	{
-		DEBUG();
-		lwt_chan_t temp = c->snd_thds->data;
-		temp->rcv_blocked = 1;
-	}
-
-
-	if(c->rcv_blocked == 1)
+	while (c->rcv_thd->status == LWT_ACTIVE)//blocked == 0) 
 	{
 		lwt_yield(LWT_NULL);
 	}
-	DEBUG();
-	printf("rcv blocked %d\n",c->rcv_blocked);	
-	while (c->rcv_blocked == 0) 
-	{
-	//	DEBUG();
 
-		lwt_yield(LWT_NULL);
-	//	printf("rcv status %d\n",c->rcv_thd->status);
-
-	}
-
-	if(c->snd_thds->ifchan == 1)
-	{
-		lwt_chan_t temp = c->snd_thds->data;
-		temp->rcv_blocked = 0;
-	}		
-	DEBUG();	
-
-/*	clist_t new_clist = (clist_t)malloc(sizeof(clist_head));
-	new_clist->thd = lwt_curr;
-	new_clist->data = data;
-	new_clist->ifnew = 0;
-	new_clist->snd_blocked = 0;
-	new_clist->next = NULL;
-
-	c->snd_cnt++;
-	enqueue_snd(c, new_clist);*/
-
-	
-	c->rcv_blocked = 0;
+	c->rcv_thd->status = LWT_ACTIVE;//blocked = 0;
 	gcounter.nsnding_counter--;
 
 	
@@ -176,41 +136,36 @@ void
 {
 	assert(c != NULL);
 
-	if (c->rcv_thd == NULL) 
+	if (c->rcv_thd != lwt_curr) 
 	{
-		c->rcv_thd = lwt_curr;
+		return NULL;
 	}
 	
-	c->rcv_blocked = 1;
-//	c->rcv_thd->status = LWT_WAITING;
+	c->rcv_thd->status = LWT_WAITING;//blocked = 1;
+
 	gcounter.nrcving_counter++;
-//	gcounter.runable_counter--;
 	
+	//if snd_thds is null, block the reciever to wait for sender
 	while (c->snd_thds == NULL) 
 	{
-		DEBUG();
-		//printf("Rcv blocking! (because of NO sender in queue)\n");
 		lwt_yield(LWT_NULL);
 	}
 
-	DEBUG();	
-	if(c->snd_thds->ifnew == 1)// || c->snd_thds->snd_blocked == 1)
+	//if the sender hasn't been executed, run it
+	if(c->snd_thds->ifnew == 1)
 	{
-		DEBUG();
 		lwt_yield(c->snd_thds->thd);
 	}
 		
 	gcounter.nrcving_counter--;
 	//somebody sent, so it can receive
-	DEBUG();
+
 	void *temp = c->snd_thds->data;
 	c->snd_cnt--;
 	dequeue_snd(c);
-	printf("c cnt %d\n",c->snd_cnt);
-	c->rcv_blocked = 0;
-//	c->rcv_thd->status = LWT_ACTIVE;
 
-//	gcounter.runable_counter++;
+	c->rcv_thd->status = LWT_ACTIVE;//blocked = 0;
+
 	return temp;
 }
 
@@ -229,14 +184,12 @@ lwt_snd_chan(lwt_chan_t c, lwt_chan_t sending)
 	new_clist->thd = c->rcv_thd;
 	new_clist->data = NULL;
 	new_clist->ifnew = 1;
-	new_clist->ifchan = 0;
-	new_clist->snd_blocked = 0;
 	new_clist->next = NULL;
 
 	sending->snd_cnt++;
 	enqueue_snd(sending, new_clist);
 	sending->rcv_thd = lwt_curr;
-	sending->rcv_blocked = 0;
+//	sending->rcv_blocked = 0;
 	
 
 	if (c->rcv_thd == NULL)
@@ -244,73 +197,36 @@ lwt_snd_chan(lwt_chan_t c, lwt_chan_t sending)
 		return -1;
 	}
 
+	//if there is node that is new added without filling the data,fill it 
 	if(c->snd_thds != NULL && c->snd_thds->ifnew == 1)
 	{
 		c->snd_thds->ifnew = 0;
 		c->snd_thds->data = sending;
-		c->snd_thds->ifchan = 1;
+
 	}	
 	else
 	{
-		DEBUG();
 		clist_t new_clist = (clist_t)malloc(sizeof(clist_head));
 		new_clist->thd = lwt_curr;
 		new_clist->data = sending;
 		new_clist->ifnew = 0;
-		new_clist->ifchan = 1;
-		new_clist->snd_blocked = 0;
 		new_clist->next = NULL;
 
 		c->snd_cnt++;
 		enqueue_snd(c, new_clist);
 	}
 	
-	DEBUG();	
 	//block current thread
 	gcounter.nsnding_counter++;
-//	c->snd_thds->snd_blocked = 1;
-	DEBUG();	
-	if(c->snd_thds->ifchan == 1)
+	
+	lwt_curr->status = LWT_WAITING;//blocked = 1;
+	while (c->rcv_thd->status == LWT_ACTIVE)//blocked == 0) 
 	{
-		lwt_chan_t temp = c->snd_thds->data;
-		temp->rcv_blocked = 1;
-	}
-	while (c->rcv_blocked == 0) 
-	{
-		//DEBUG();
-		/*if(c->snd_thds->ifchan == 1)
-		{
-			DEBUG();
-			lwt_chan_t temp = c->snd_thds->data;
-			temp->rcv_blocked = 1;
-		}*/
 		lwt_yield(LWT_NULL);
-		/*if(c->snd_thds->ifchan == 1)
-		{
-			DEBUG();
-			lwt_chan_t temp = c->snd_thds->data;
-			temp->rcv_blocked = 0;
-		}*/
 			
 	}
-		
-	if(c->snd_thds->ifchan == 1)
-	{
-		lwt_chan_t temp = c->snd_thds->data;
-		temp->rcv_blocked = 0;
-	}
-/*	clist_t new_clist = (clist_t)malloc(sizeof(clist_head));
-	new_clist->thd = lwt_curr;
-	new_clist->data = data;
-	new_clist->ifnew = 0;
-	new_clist->snd_blocked = 0;
-	new_clist->next = NULL;
-
-	c->snd_cnt++;
-	enqueue_snd(c, new_clist);*/
-
 	
-	c->rcv_blocked = 0;
+	c->rcv_thd->status = LWT_ACTIVE;//blocked = 0;
 	gcounter.nsnding_counter--;
 
 	
@@ -345,7 +261,6 @@ lwt_create_chan(lwt_chan_fn_t fn, lwt_chan_t c)
 	new_clist->thd = lwt;
 	new_clist->data = NULL;
 	new_clist->next = NULL;
-	new_clist->snd_blocked = 0;
 	new_clist->ifnew = 1;
 	c->snd_cnt++;
 	enqueue_snd(c, new_clist);

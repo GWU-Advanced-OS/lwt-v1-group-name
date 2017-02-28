@@ -4,7 +4,7 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
-CHANNEL_H	channel.h	3;"	d
+CHANNEL_H	channel.h	4;"	d
 DEBUG	lwt.h	7;"	d
 IS_RESET	main1.c	73;"	d	file:
 IS_RESET	main2.c	42;"	d	file:
@@ -38,12 +38,15 @@ __lwt_schedule	lwt.c	/^__lwt_schedule(void)$/;"	f
 __lwt_stack_get	lwt.c	/^*__lwt_stack_get()$/;"	f
 __lwt_stack_return	lwt.c	/^__lwt_stack_return(void *lwt)$/;"	f
 __lwt_start	lwt.c	/^__lwt_start()$/;"	f
+__vaild_sender	channel.c	/^__vaild_sender(lwt_t lwt)$/;"	f
 _global_counter_t	lwt.h	/^typedef struct _global_counter_t$/;"	s
 _lwt_t	lwt.h	/^typedef struct _lwt_t$/;"	s
 avail_counter	lwt.h	/^	uint avail_counter;$/;"	m	struct:_global_counter_t
-blocked	lwt.h	/^	uint blocked;$/;"	m	struct:_lwt_t
 blocked_counter	lwt.h	/^	uint blocked_counter;$/;"	m	struct:_global_counter_t
 bsp	lwt.h	/^	ulong bsp;$/;"	m	struct:_lwt_t
+chan_list	channel.h	/^typedef struct chan_list$/;"	s
+chan_list	channel.h	/^}chan_list, *chan_list_t;$/;"	t	typeref:struct:chan_list
+chan_list_t	channel.h	/^}chan_list, *chan_list_t;$/;"	t	typeref:struct:chan_list
 clist_head	channel.h	/^typedef struct clist_head$/;"	s
 clist_head	channel.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
 clist_t	channel.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
@@ -54,6 +57,7 @@ data	lwt.h	/^	void *data;$/;"	m	struct:_lwt_t
 dequeue_snd	channel.c	/^dequeue_snd(lwt_chan_t c)$/;"	f
 died_counter	lwt.h	/^	uint died_counter;$/;"	m	struct:_global_counter_t
 enqueue_snd	channel.c	/^enqueue_snd(lwt_chan_t c, clist_t new)$/;"	f
+enqueue_snd_list	channel.c	/^enqueue_snd_list(lwt_chan_t c, chan_list_t new)$/;"	f
 flag	test.c	/^int flag=0;$/;"	v
 fn	lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:_lwt_t
 fn_bounce	main1.c	/^fn_bounce(void *d) $/;"	f
@@ -118,6 +122,7 @@ n	lwt_list.h	/^		struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_l
 n	ps_list.h	/^	struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::ps_list
 nchan_counter	lwt.h	/^	uint nchan_counter;$/;"	m	struct:_global_counter_t
 nchan_num	channel.c	/^int nchan_num = 0;$/;"	v
+next	channel.h	/^	struct chan_list *next;$/;"	m	struct:chan_list	typeref:struct:chan_list::chan_list
 next	channel.h	/^	struct clist_head *next;$/;"	m	struct:clist_head	typeref:struct:clist_head::clist_head
 nrcving_counter	lwt.h	/^	uint nrcving_counter;$/;"	m	struct:_global_counter_t
 nsnding_counter	lwt.h	/^	uint nsnding_counter;$/;"	m	struct:_global_counter_t
@@ -173,7 +178,6 @@ ps_list_rem_d	ps_list.h	154;"	d
 ps_list_singleton	ps_list.h	126;"	d
 ps_list_singleton_d	ps_list.h	148;"	d
 ps_offsetof	ps_list.h	100;"	d
-rcv_blocked	channel.h	/^	int rcv_blocked; 			\/* if the receiver is blocked *\/$/;"	m	struct:lwt_channel
 rcv_thd	channel.h	/^	lwt_t rcv_thd;	 			\/* the receiver *\/$/;"	m	struct:lwt_channel
 rdtscll	main1.c	7;"	d	file:
 rdtscll	main2.c	7;"	d	file:
@@ -183,6 +187,8 @@ runable_counter	lwt.h	/^	uint runable_counter;$/;"	m	struct:_global_counter_t
 sched	main1.c	/^volatile int sched[2] = {0, 0};$/;"	v
 sched	main2.c	/^volatile int sched[2] = {0, 0};$/;"	v
 snd_cnt	channel.h	/^	int snd_cnt; 				\/* number of sending threads *\/$/;"	m	struct:lwt_channel
+snd_list_head	channel.h	/^	chan_list_t snd_list_head;$/;"	m	struct:lwt_channel
+snd_list_tail	channel.h	/^	chan_list_t snd_list_tail;$/;"	m	struct:lwt_channel
 snd_thds	channel.h	/^	clist_t snd_thds;			\/* list of those threads *\/$/;"	m	struct:lwt_channel
 sp	lwt.h	/^	ulong sp;$/;"	m	struct:_lwt_t
 sp	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
@@ -196,6 +202,7 @@ test_crt_join_sched	main2.c	/^test_crt_join_sched(void)$/;"	f
 test_perf	main1.c	/^test_perf(void)$/;"	f
 test_perf	main2.c	/^test_perf(void)$/;"	f
 test_perf_channels	main2.c	/^test_perf_channels(int chsz)$/;"	f
+thd	channel.h	/^	lwt_t thd;$/;"	m	struct:chan_list
 thd	channel.h	/^	lwt_t thd;$/;"	m	struct:clist_head
 thread	test1.c	/^void thread()$/;"	f
 thread1	test1.c	/^void thread1()$/;"	f
@@ -203,4 +210,5 @@ uchar	lwt.h	/^typedef unsigned char uchar;$/;"	t
 uint	lwt.h	/^typedef unsigned int uint;$/;"	t
 ulong	lwt.h	/^typedef unsigned long ulong;$/;"	t
 ushort	lwt.h	/^typedef unsigned short ushort;$/;"	t
+valid_val	lwt.h	/^	int valid_val;		\/\/to identify if this lwt is a vaild sender to a specific channel$/;"	m	struct:_lwt_t
 yield	test1.c	/^void yield()$/;"	f

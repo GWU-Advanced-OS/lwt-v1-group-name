@@ -44,12 +44,12 @@ typedef struct _lwt_t
 //	stack_t stack;
 	ulong bsp;
 	uint id;
-//	uint blocked;
 	lwt_status_t status;	
 	lwt_fn_t fn;
 	void *data;
 	void *return_val;
 	uchar ifrecycled;	//to identify if this lwt is now in the pool
+	int valid_val;		//to identify if this lwt is a vaild sender to a specific channel
 	struct _lwt_t *joiner;
 	struct _lwt_t *target;
 	struct ps_list list;
