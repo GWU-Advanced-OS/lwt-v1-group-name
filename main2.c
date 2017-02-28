@@ -6,7 +6,7 @@
 #include "channel.h"
 #define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
 
-#define ITER 10000
+#define ITER 10000 
 
 /* 
  * My output on an Intel Core i5-2520M CPU @ 2.50GHz:
@@ -176,16 +176,13 @@ fn_chan(lwt_chan_t to)
 	int i;
 	from = lwt_chan(0);
 	lwt_snd_chan(to, from);
-
-	assert(from->snd_cnt == 0);
-
+	assert(from->snd_cnt);
 	for (i = 0 ; i < ITER ; i++) {
 		lwt_snd(to, (void*)1);
-
 		assert(2 == (int)lwt_rcv(from));
+
 	}
 	lwt_chan_deref(from);
-	
 	return NULL;
 }
 
@@ -202,8 +199,7 @@ test_perf_channels(int chsz)
 	assert(from);
 	t    = lwt_create_chan(fn_chan, from);
 	to   = lwt_rcv_chan(from);
-	assert(to->snd_cnt == 0);
-
+	assert(to->snd_cnt);
 	rdtscll(start);
 	for (i = 0 ; i < ITER ; i++) {
 		assert(1 == (int)lwt_rcv(from));

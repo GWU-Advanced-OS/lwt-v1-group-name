@@ -5,7 +5,7 @@
 typedef struct clist_head
 {
 	int id;
-	//int snd_blocked;
+	int ifnew;
 	void* data;
 	lwt_t thd;
 	struct clist_head *next;

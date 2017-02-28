@@ -41,6 +41,7 @@ __lwt_start	lwt.c	/^__lwt_start()$/;"	f
 _global_counter_t	lwt.h	/^typedef struct _global_counter_t$/;"	s
 _lwt_t	lwt.h	/^typedef struct _lwt_t$/;"	s
 avail_counter	lwt.h	/^	uint avail_counter;$/;"	m	struct:_global_counter_t
+blocked	lwt.h	/^	uint blocked;$/;"	m	struct:_lwt_t
 blocked_counter	lwt.h	/^	uint blocked_counter;$/;"	m	struct:_global_counter_t
 bsp	lwt.h	/^	ulong bsp;$/;"	m	struct:_lwt_t
 clist_head	channel.h	/^typedef struct clist_head$/;"	s
@@ -73,6 +74,7 @@ global_counter_t	lwt.h	/^}global_counter_t;$/;"	t	typeref:struct:_global_counter
 id	channel.h	/^	int id;     \/* channel's id*\/$/;"	m	struct:lwt_channel
 id	channel.h	/^	int id;$/;"	m	struct:clist_head
 id	lwt.h	/^	uint id;$/;"	m	struct:_lwt_t
+ifnew	channel.h	/^	int ifnew;$/;"	m	struct:clist_head
 ifrecycled	lwt.h	/^	uchar ifrecycled;	\/\/to identify if this lwt is now in the pool$/;"	m	struct:_lwt_t
 ip	lwt.h	/^	ulong ip;$/;"	m	struct:_lwt_t
 ip	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
@@ -114,8 +116,8 @@ main	test.c	/^void main()$/;"	f
 main	test1.c	/^void main()$/;"	f
 n	lwt_list.h	/^		struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::ps_list
 n	ps_list.h	/^	struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::ps_list
-n_chan	channel.h	/^int n_chan; \/\/channel counter$/;"	v
 nchan_counter	lwt.h	/^	uint nchan_counter;$/;"	m	struct:_global_counter_t
+nchan_num	channel.c	/^int nchan_num = 0;$/;"	v
 next	channel.h	/^	struct clist_head *next;$/;"	m	struct:clist_head	typeref:struct:clist_head::clist_head
 nrcving_counter	lwt.h	/^	uint nrcving_counter;$/;"	m	struct:_global_counter_t
 nsnding_counter	lwt.h	/^	uint nsnding_counter;$/;"	m	struct:_global_counter_t

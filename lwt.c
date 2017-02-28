@@ -279,14 +279,14 @@ __lwt_schedule(void)
 		return;
 	}
 		
-	if(lwt_curr != lwt_tail)
+/*	if(lwt_curr != lwt_tail)
 	{		
 		ps_list_rem_d(lwt_curr);
 		ps_list_add_d(lwt_tail,lwt_curr);
 		lwt_tail = lwt_curr;
-	}                              	
+	}     */                         	
 
-	temp = ps_list_next_d(lwt_tail);
+	temp = ps_list_next_d(lwt_curr);//tail);
 	while(temp->status != LWT_ACTIVE)
 	{
 		temp = ps_list_next_d(temp);
