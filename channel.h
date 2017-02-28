@@ -12,7 +12,7 @@ typedef struct clist_head
 {
 	int id;
 	void* data;
-	int ifnew;
+//	int ifnew;
 	lwt_t thd;
 	struct clist_head *next;
 
