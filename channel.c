@@ -94,7 +94,8 @@ lwt_snd(lwt_chan_t c, void *data)
    	{
 		return -1;
 	}
-
+	
+	//if there is node that is new added without filling the data,fill it 
 	if(c->snd_thds != NULL && c->snd_thds->ifnew == 1)
 	{
 		c->snd_thds->ifnew = 0;
@@ -135,20 +136,22 @@ void
 {
 	assert(c != NULL);
 
-	if (c->rcv_thd == NULL) 
+	if (c->rcv_thd != lwt_curr) 
 	{
-		c->rcv_thd = lwt_curr;
+		return NULL;
 	}
 	
 	c->rcv_thd->blocked = 1;
 
 	gcounter.nrcving_counter++;
 	
+	//if snd_thds is null, block the reciever to wait for sender
 	while (c->snd_thds == NULL) 
 	{
 		lwt_yield(LWT_NULL);
 	}
 
+	//if the sender hasn't been executed, run it
 	if(c->snd_thds->ifnew == 1)
 	{
 		lwt_yield(c->snd_thds->thd);
@@ -194,6 +197,7 @@ lwt_snd_chan(lwt_chan_t c, lwt_chan_t sending)
 		return -1;
 	}
 
+	//if there is node that is new added without filling the data,fill it 
 	if(c->snd_thds != NULL && c->snd_thds->ifnew == 1)
 	{
 		c->snd_thds->ifnew = 0;
