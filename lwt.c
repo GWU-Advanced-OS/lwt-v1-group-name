@@ -430,6 +430,7 @@ lwt_chan_deref(lwt_chan_t c)
 	}
 	else
 	{
+		DEBUG();
 		assert(0);
 	}
 	return;
@@ -464,17 +465,17 @@ lwt_snd(lwt_chan_t c, void *data)
 	gcounter.runable_counter--;
 	if(c->data_buffer.size == 0)
 	{
+
+		//block current thread
+		while (c->rcv_thd->status == LWT_ACTIVE)//blocked == 0) 
+		{
+			lwt_yield(LWT_NULL);								
+		}
 		//if there is node that is new added without filling the data,fill it 
 		clist_t new_clist = (clist_t)__channel_get();
 		new_clist->thd = lwt_head;
 		new_clist->data = data;					
 		clist_add(new_clist,c);
-		//block current thread
-		lwt_head->status = LWT_WAITING;				
-		while (c->rcv_thd->status == LWT_ACTIVE)//blocked == 0) 
-		{
-			lwt_yield(LWT_NULL);								
-		}
 	}
 	else
 	{
