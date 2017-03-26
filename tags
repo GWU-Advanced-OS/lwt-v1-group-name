@@ -27,6 +27,8 @@ STACK_SIZE	lwt.h	12;"	d
 _LWT_H	lwt.h	3;"	d
 __channel_get	lwt.c	/^*__channel_get()$/;"	f
 __channel_return	lwt.c	/^__channel_return(void *chan)$/;"	f
+__clist_get	lwt.c	/^*__clist_get()$/;"	f
+__clist_return	lwt.c	/^__clist_return(void *chan)$/;"	f
 __get_space_from_pool	lwt.c	/^*__get_space_from_pool(int space_size)$/;"	f
 __init	lwt.c	/^__init()  $/;"	f
 __init_pool	lwt.c	/^__init_pool()$/;"	f
@@ -39,13 +41,13 @@ __lwt_start	lwt.c	/^__lwt_start()$/;"	f
 _global_counter_t	lwt.h	/^typedef struct _global_counter_t$/;"	s
 _lwt_t	lwt.h	/^typedef struct _lwt_t$/;"	s
 avail_chan_counter	lwt.h	/^	uint avail_chan_counter;$/;"	m	struct:_global_counter_t
+avail_clist_counter	lwt.h	/^	uint avail_clist_counter;$/;"	m	struct:_global_counter_t
 avail_counter	lwt.h	/^	uint avail_counter;$/;"	m	struct:_global_counter_t
 blocked_counter	lwt.h	/^	uint blocked_counter;$/;"	m	struct:_global_counter_t
 bsp	lwt.h	/^	ulong bsp;$/;"	m	struct:_lwt_t
 cgroup	lwt.h	/^typedef struct cgroup$/;"	s
 cgroup	lwt.h	/^} cgroup, *lwt_cgrp_t;$/;"	t	typeref:struct:cgroup
 cgrp	lwt.h	/^	lwt_cgrp_t cgrp;		\/\/ belongs to which group$/;"	m	struct:lwt_channel
-chan	lwt.h	/^		struct lwt_channel *chan;$/;"	m	struct:cgroup	typeref:struct:cgroup::lwt_channel
 clist_head	lwt.h	/^typedef struct clist_head$/;"	s
 clist_head	lwt.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
 clist_t	lwt.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
@@ -54,9 +56,10 @@ curr	main2.c	/^volatile int curr = 0;$/;"	v
 data	lwt.h	/^	void *data;$/;"	m	struct:_lwt_t
 data	lwt.h	/^	void* data;$/;"	m	struct:clist_head
 data	lwt.h	/^	void** data;  $/;"	m	struct:ring_buffer
-data_buffer	lwt.h	/^	ring_buffer* data_buffer;$/;"	m	struct:lwt_channel
+data_buffer	lwt.h	/^	ring_buffer data_buffer;$/;"	m	struct:lwt_channel
 died_counter	lwt.h	/^	uint died_counter;$/;"	m	struct:_global_counter_t
-end	lwt.h	/^	int end;				$/;"	m	struct:ring_buffer
+end	lwt.h	/^	int end;$/;"	m	struct:ring_buffer
+events	lwt.h	/^	struct lwt_channel *events;  $/;"	m	struct:cgroup	typeref:struct:cgroup::lwt_channel
 flag	test.c	/^int flag=0;$/;"	v
 fn	lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:_lwt_t
 fn_bounce	main1.c	/^fn_bounce(void *d) $/;"	f
@@ -74,8 +77,8 @@ fn_sequence	main1.c	/^fn_sequence(void *d)$/;"	f
 fn_sequence	main2.c	/^fn_sequence(void *d)$/;"	f
 gcounter	lwt.h	/^global_counter_t gcounter;$/;"	v
 global_counter_t	lwt.h	/^}global_counter_t;$/;"	t	typeref:struct:_global_counter_t
-id	lwt.h	/^		int id;$/;"	m	struct:cgroup
 id	lwt.h	/^	int id;     \/* channel's id*\/$/;"	m	struct:lwt_channel
+id	lwt.h	/^	int id;$/;"	m	struct:cgroup
 id	lwt.h	/^	uint id;$/;"	m	struct:_lwt_t
 ip	lwt.h	/^	ulong ip;$/;"	m	struct:_lwt_t
 ip	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
@@ -124,14 +127,16 @@ main	test.c	/^void main()$/;"	f
 main	test1.c	/^void main()$/;"	f
 mark	lwt.h	/^	void *mark;$/;"	m	struct:lwt_channel
 n	ps_list.h	/^	struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::ps_list
-n_chan	lwt.h	/^		int n_chan;          \/\/number of channels in the group$/;"	m	struct:cgroup
+n_chan	lwt.h	/^	int n_chan;          \/\/number of channels in the group$/;"	m	struct:cgroup
 nchan_counter	lwt.h	/^	uint nchan_counter;$/;"	m	struct:_global_counter_t
 nchan_id	lwt.h	/^	uint nchan_id;$/;"	m	struct:_global_counter_t
 nrcving_counter	lwt.h	/^	uint nrcving_counter;$/;"	m	struct:_global_counter_t
 nsnding_counter	lwt.h	/^	uint nsnding_counter;$/;"	m	struct:_global_counter_t
+num	lwt.h	/^	int num;	$/;"	m	struct:ring_buffer
 p	ps_list.h	/^	struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::
 pool	lwt.c	/^void *pool;$/;"	v
-pool_chan_head	lwt.c	/^clist_t pool_chan_head;$/;"	v
+pool_chan_head	lwt.c	/^lwt_chan_t pool_chan_head;$/;"	v
+pool_clist_head	lwt.c	/^clist_t pool_clist_head;$/;"	v
 pool_head	lwt.c	/^lwt_t pool_head;$/;"	v
 ps_container	ps_list.h	103;"	d
 ps_list	ps_list.h	/^struct ps_list {$/;"	s
@@ -177,10 +182,10 @@ rbIsFull	lwt.c	/^int rbIsFull(ring_buffer* rb) $/;"	f
 rb_add	lwt.c	/^void rb_add(ring_buffer* rb, void* data) $/;"	f
 rb_get	lwt.c	/^void* rb_get(ring_buffer* rb) $/;"	f
 rb_init	lwt.c	/^void rb_init(ring_buffer* rb, int size) $/;"	f
+rcv_blocked	lwt.h	/^	int rcv_blocked;$/;"	m	struct:lwt_channel
 rcv_thd	lwt.h	/^	lwt_t rcv_thd;	 			\/* the receiver *\/$/;"	m	struct:lwt_channel
 rdtscll	main1.c	7;"	d	file:
 rdtscll	main2.c	6;"	d	file:
-ready	lwt.h	/^		struct lwt_channel *ready;  $/;"	m	struct:cgroup	typeref:struct:cgroup::lwt_channel
 rest_pool	lwt.c	/^ulong rest_pool;$/;"	v
 return_val	lwt.h	/^	void *return_val;$/;"	m	struct:_lwt_t
 ring_buffer	lwt.h	/^typedef struct ring_buffer {$/;"	s
@@ -191,7 +196,7 @@ sched	main2.c	/^volatile int sched[2] = {0, 0};$/;"	v
 size	lwt.h	/^	int size;				\/\/ size of the buffer$/;"	m	struct:lwt_channel
 size	lwt.h	/^	int size;$/;"	m	struct:ring_buffer
 snd_cnt	lwt.h	/^	int snd_cnt; 				\/* number of sending threads *\/$/;"	m	struct:lwt_channel
-snd_thds	lwt.h	/^	clist_t snd_thds;			\/* list of those threads *\/$/;"	m	struct:lwt_channel
+snd_thds	lwt.h	/^	clist_t snd_thds;$/;"	m	struct:lwt_channel
 sp	lwt.h	/^	ulong sp;$/;"	m	struct:_lwt_t
 sp	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
 start	lwt.h	/^	int start;$/;"	m	struct:ring_buffer

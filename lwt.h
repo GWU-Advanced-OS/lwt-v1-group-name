@@ -73,6 +73,8 @@ typedef struct _global_counter_t
 	uint nchan_id;
 	/*counter for available thread*/
 	uint avail_chan_counter;
+	/*counter for available clist*/
+	uint avail_clist_counter;
 }global_counter_t;
 
 typedef struct ring_buffer {
@@ -85,18 +87,26 @@ typedef struct ring_buffer {
 
 typedef struct cgroup
 {
-		int id;
-		int n_chan;          //number of channels in the group
-		//the channel that ready to receive, point to the head of the event queue   
-		struct lwt_channel *events;  
+	int id;
+	int n_chan;          //number of channels in the group
+	//the channel that ready to receive, point to the head of the event queue   
+	struct lwt_channel *events;  
 
 } cgroup, *lwt_cgrp_t;
+
+typedef struct clist_head
+{
+	void* data;
+	lwt_t thd;
+	struct ps_list list;
+} clist_head, *clist_t;
 
 typedef struct lwt_channel 
 {
 	int id;     /* channel's id*/
 	/* sender’s data */
 	int snd_cnt; 				/* number of sending threads */
+	clist_t snd_thds;
 	/* receiver’s data */
 	int rcv_blocked;
 	lwt_t rcv_thd;	 			/* the receiver */
