@@ -78,7 +78,8 @@ typedef struct _global_counter_t
 typedef struct ring_buffer {
 	int size;
 	int start;
-	int end;				
+	int end;
+	int num;	
 	void** data;  
 } ring_buffer;
 
@@ -104,7 +105,7 @@ typedef struct lwt_channel
 	int iscgrp;            //check if it added to a group
 	lwt_cgrp_t cgrp;		// belongs to which group
 	int size;				// size of the buffer
-	ring_buffer* data_buffer;
+	ring_buffer data_buffer;
 	struct ps_list list;
 } lwt_channel, *lwt_chan_t;
 

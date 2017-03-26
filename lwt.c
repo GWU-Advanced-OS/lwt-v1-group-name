@@ -57,7 +57,7 @@ __init_thread_head()
 void
 __init_pool()
 {
-	rest_pool = 5 * (sizeof(struct _lwt_t ) + STACK_SIZE + sizeof(struct lwt_channel) + sizeof(ring_buffer));
+	rest_pool = 5 * (sizeof(struct _lwt_t ) + STACK_SIZE + sizeof(struct lwt_channel));
 	pool =  malloc(rest_pool);
 }
 
@@ -321,33 +321,38 @@ void
 void rb_init(ring_buffer* rb, int size) 
 {
 	assert(size >= 0);
-	rb->size = size+2;
+	rb->size = size+1;
 	rb->start = 0;
-	rb->end =0;
-	rb->data = (void **)calloc(rb->size - 1, sizeof(void *));
+	rb->end = 0;
+	rb->num = 0;
+	rb->data = (void **)calloc(rb->size, sizeof(void *));
 }
 
 int rbIsFull(ring_buffer* rb) 
 {
-	return (rb->end + 1) % rb->size == rb->start;
+		return (rb->num) == rb->size;
 }	
 
 int rbIsEmpty(ring_buffer* rb) 
 {
-	return rb->end == rb->start; 
+	return rb->num == 0; 
 }
 
 void rb_add(ring_buffer* rb, void* data) 
 {
+	printf("end = %d\n",rb->end);
 	rb->data[rb->end] = data;
-	rb->end = (rb->end + 1) % rb->size;
+	rb->end = (rb->end + 1)%rb->size;
+	rb->num++;
 	return;
 }
 
 void* rb_get(ring_buffer* rb) 
 {
+	printf("start = %d\n",rb->start);
 	void* temp = rb->data[rb->start];
-	rb->start = (rb->start + 1) % rb->size;
+	rb->start = (rb->start + 1)%rb->size;
+	rb->num--;
 	return temp;
 }
 
@@ -362,7 +367,7 @@ lwt_chan(int sz)
 {
 
 	lwt_chan_t new = (lwt_chan_t)__channel_get();
-	rb_init(new->data_buffer,sz);
+	rb_init(&new->data_buffer,sz);
 	new->snd_cnt = 0;
 	new->id = gcounter.nchan_id++;
 	gcounter.nchan_counter++;
@@ -422,20 +427,20 @@ lwt_snd(lwt_chan_t c, void *data)
 			ps_list_add_d(ps_list_prev_d(c->cgrp->events),c);
 		}
 	}
-
+	DEBUG();
 	//block current thread
 	gcounter.nsnding_counter++;
 	gcounter.runable_counter--;
-	while(rbIsFull(c->data_buffer)) 
+	while(rbIsFull(&c->data_buffer)) 
 	{
+		DEBUG();
 		lwt_yield(LWT_NULL);
 							
 	}	
-
-	c->rcv_blocked = 0;
+	c->rcv_thd->status = LWT_ACTIVE;
 	gcounter.nsnding_counter--;
 	gcounter.runable_counter++;
-	rb_add(c->data_buffer, data);
+	rb_add(&c->data_buffer, data);
 	return 0;
 }
 
@@ -449,16 +454,16 @@ void
 		return NULL;
 	}
 
-	c->rcv_blocked = 1;//blocked = 1;
+	c->rcv_thd->status = LWT_WAITING;//blocked = 1;
 	gcounter.nrcving_counter++;
 	//if empty, block rcv, remove c from ready queue
 	gcounter.runable_counter--;
-	while (rbIsEmpty(c->data_buffer)) {
+	while (rbIsEmpty(&c->data_buffer)) {
+		DEBUG();
 		lwt_yield(LWT_NULL);
 	}
 	gcounter.nrcving_counter--;
 	gcounter.runable_counter++;
-	c->rcv_blocked = 0;//blocked = 0;
 	
 	//remove the event
 	if (c->cgrp != NULL) 
@@ -476,7 +481,7 @@ void
 			}
 		}			
 	} 
-	return rb_get(c->data_buffer);
+	return rb_get(&c->data_buffer);
 }
 
 /* 
@@ -530,17 +535,15 @@ void
 
 	if(gcounter.avail_chan_counter == 0)
 	{
-		uint size = sizeof(struct lwt_channel) + sizeof(ring_buffer);
+		uint size = sizeof(struct lwt_channel);
 		if(rest_pool >= size)
 		{	
 			pool_chan_head = __get_space_from_pool(size);
-			pool_chan_head->data_buffer = (void *)pool_chan_head + sizeof(struct lwt_channel);
 			rest_pool -= size;
 		}
 		else
 		{
 			pool_chan_head = malloc(size);
-			pool_chan_head->data_buffer = (void *)pool_chan_head + sizeof(struct lwt_channel);
 		}
 		return pool_chan_head;
 	}
@@ -604,7 +607,7 @@ int lwt_cgrp_add(lwt_cgrp_t cgrp, lwt_chan_t c)
 
 int lwt_cgrp_rem(lwt_cgrp_t cgrp, lwt_chan_t c)
 {
-	if (rbIsEmpty(c->data_buffer) == 0) 
+	if (rbIsEmpty(&c->data_buffer) == 0) 
 		return 1; //cgrp has a pending event
 	if(cgrp != c->cgrp)
 		return -1;	
