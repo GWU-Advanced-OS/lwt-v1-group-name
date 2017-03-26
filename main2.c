@@ -3,7 +3,6 @@
 #include <assert.h>
 
 #include "lwt.h"
-#include "channel.h"
 #define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
 
 #define ITER 10000 

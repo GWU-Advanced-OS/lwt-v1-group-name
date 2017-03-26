@@ -45,43 +45,6 @@ dequeue_snd(lwt_chan_t c)
 	}
 }
 
-void 
-enqueue_snd_list(lwt_chan_t c, chan_list_t new)
-{
-	if(c->snd_list_head == NULL) 
-	{
-		c->snd_list_head = new;
-		c->snd_list_tail = new;
-		return;
-	}
-   	else 
-	{
-		c->snd_list_tail->next = new;
-		c->snd_list_tail = new;
-		return;
-	}
-}
-
-int 
-__valid_sender(lwt_chan_t c, lwt_t lwt)
-{
-	if(c->id == lwt->valid_val)
-	{
-		return 1;
-	}
-	chan_list_t temp = c->snd_list_head;	
-	while(temp != NULL)
-	{
-		if(temp->thd == lwt)
-		{
-			return 1;
-		}
-		temp = temp->next;
-	}
-	return 0;
-//	return 1;
-
-}
 /* 
  * Currently assume that sz is always 0. 
  * This function uses malloc to allocate 
@@ -98,7 +61,6 @@ lwt_chan(int sz)
 	gcounter.nchan_counter++;
 	new->snd_thds = NULL;
 	new->rcv_thd = lwt_curr;
-//	new->rcv_thd->blocked = 0;
 	return new;
 }
 
@@ -113,10 +75,17 @@ lwt_chan_deref(lwt_chan_t c)
 	if (c->snd_thds == NULL && c->rcv_thd->status != LWT_WAITING) 
 	{
 		gcounter.nchan_counter--;
-		free(c); 	//will also set "rcv_thd" as NULL
+		c->rcv_thd = NULL; 	//will also set "rcv_thd" as NULL
 		return;
 	}
-	printf("Cannot deallocate the channel.\n");
+	else if(c->snd_cnt > 0)
+	{
+		c->snd_cnt--;
+	}
+	else
+	{
+		assert(0);
+	}
 	return;
 }
 
@@ -131,11 +100,6 @@ lwt_snd(lwt_chan_t c, void *data)
 		return -1;
 	}
 
-	if(!__valid_sender(c,lwt_curr))
-	{
-		return -2;
-	}
-
 	//if there is node that is new added without filling the data,fill it 
 	clist_t new_clist = (clist_t)malloc(sizeof(clist_head));
 	new_clist->thd = lwt_curr;
@@ -147,7 +111,6 @@ lwt_snd(lwt_chan_t c, void *data)
 	//block current thread
 	gcounter.nsnding_counter++;
 
-//	lwt_curr->blocked = 1;
 	lwt_curr->status = LWT_WAITING;
 	
 	while (c->rcv_thd->status == LWT_ACTIVE)//blocked == 0) 
@@ -205,11 +168,6 @@ lwt_snd_chan(lwt_chan_t c, lwt_chan_t sending)
 {
 	//data being NULL or rcv being null is illegal
 	assert(c && sending);
-
-	chan_list_t list = malloc(sizeof(chan_list));	
-	list->thd = c->rcv_thd;
-	list->thd->valid_val = sending->id;
-	enqueue_snd_list(c, list);
 	sending->snd_cnt++;
 	sending->rcv_thd = lwt_curr;
 
@@ -220,10 +178,6 @@ lwt_snd_chan(lwt_chan_t c, lwt_chan_t sending)
 		return -1;
 	}
 
-	if(!__valid_sender(c,lwt_curr))
-	{
-		return -2;
-	}
 	//if there is node that is new added without filling the data,fill it 
 	clist_t new_clist = (clist_t)malloc(sizeof(clist_head));
 	new_clist->thd = lwt_curr;
@@ -273,10 +227,6 @@ lwt_create_chan(lwt_chan_fn_t fn, lwt_chan_t c)
 	
 	lwt_t lwt = lwt_create((lwt_fn_t)fn,(void*)c);
 	
-	chan_list_t list = malloc(sizeof(chan_list));	
-	list->thd = lwt;
-	lwt->valid_val = c->id;
-	enqueue_snd_list(c, list);
 	c->snd_cnt++;
 
 	return lwt;
