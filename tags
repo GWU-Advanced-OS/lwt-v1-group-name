@@ -19,6 +19,8 @@ LWT_INFO_NSNDING	lwt.h	/^	LWT_INFO_NSNDING,$/;"	e	enum:__anon1
 LWT_INFO_NTHD_BLOCKED	lwt.h	/^	LWT_INFO_NTHD_BLOCKED,$/;"	e	enum:__anon1
 LWT_INFO_NTHD_RUNNABLE	lwt.h	/^	LWT_INFO_NTHD_RUNNABLE,$/;"	e	enum:__anon1
 LWT_INFO_NTHD_ZOMBIES	lwt.h	/^	LWT_INFO_NTHD_ZOMBIES,$/;"	e	enum:__anon1
+LWT_JOIN	lwt.h	/^	LWT_JOIN,$/;"	e	enum:__anon3
+LWT_NOJOIN	lwt.h	/^	LWT_NOJOIN,$/;"	e	enum:__anon3
 LWT_NULL	lwt.h	15;"	d
 LWT_WAITING	lwt.h	/^	LWT_WAITING,$/;"	e	enum:__anon2
 PS_LIST_DEF_NAME	ps_list.h	65;"	d
@@ -28,7 +30,7 @@ _LWT_H	lwt.h	3;"	d
 __channel_get	lwt.c	/^*__channel_get()$/;"	f
 __channel_return	lwt.c	/^__channel_return(void *chan)$/;"	f
 __clist_get	lwt.c	/^*__clist_get()$/;"	f
-__clist_return	lwt.c	/^__clist_return(void *chan)$/;"	f
+__clist_return	lwt.c	/^__clist_return(void *clist)$/;"	f
 __get_space_from_pool	lwt.c	/^*__get_space_from_pool(int space_size)$/;"	f
 __init	lwt.c	/^__init()  $/;"	f
 __init_pool	lwt.c	/^__init_pool()$/;"	f
@@ -40,6 +42,7 @@ __lwt_stack_return	lwt.c	/^__lwt_stack_return(void *lwt)$/;"	f
 __lwt_start	lwt.c	/^__lwt_start()$/;"	f
 _global_counter_t	lwt.h	/^typedef struct _global_counter_t$/;"	s
 _lwt_t	lwt.h	/^typedef struct _lwt_t$/;"	s
+avail_cgrp_counter	lwt.h	/^	uint avail_cgrp_counter;$/;"	m	struct:_global_counter_t
 avail_chan_counter	lwt.h	/^	uint avail_chan_counter;$/;"	m	struct:_global_counter_t
 avail_clist_counter	lwt.h	/^	uint avail_clist_counter;$/;"	m	struct:_global_counter_t
 avail_counter	lwt.h	/^	uint avail_counter;$/;"	m	struct:_global_counter_t
@@ -104,16 +107,19 @@ lwt_channel	lwt.h	/^typedef struct lwt_channel $/;"	s
 lwt_channel	lwt.h	/^} lwt_channel, *lwt_chan_t;$/;"	t	typeref:struct:lwt_channel
 lwt_context	lwt_dispatch.h	/^struct lwt_context {$/;"	s
 lwt_count	lwt.h	/^	uint lwt_count;		$/;"	m	struct:_global_counter_t
-lwt_create	lwt.c	/^lwt_create(lwt_fn_t fn, void *data)$/;"	f
+lwt_create	lwt.c	/^lwt_create(lwt_fn_t fn, void *data, lwt_flags_t flags)$/;"	f
 lwt_create_chan	lwt.c	/^lwt_create_chan(lwt_chan_fn_t fn, lwt_chan_t c)$/;"	f
+lwt_curr	lwt.h	/^lwt_t lwt_curr;$/;"	v
 lwt_current	lwt.c	/^lwt_current(void)$/;"	f
 lwt_die	lwt.c	/^lwt_die(void *data)$/;"	f
+lwt_flags_t	lwt.h	/^}lwt_flags_t;$/;"	t	typeref:enum:__anon3
 lwt_fn_t	lwt.h	/^typedef void *(*lwt_fn_t) (void *);$/;"	t
 lwt_head	lwt.h	/^lwt_t lwt_head;$/;"	v
 lwt_id	lwt.c	/^lwt_id(lwt_t lwt)$/;"	f
 lwt_info	lwt.c	/^lwt_info(lwt_info_t t)$/;"	f
 lwt_info_t	lwt.h	/^} lwt_info_t;$/;"	t	typeref:enum:__anon1
 lwt_join	lwt.c	/^lwt_join(lwt_t lwt)$/;"	f
+lwt_nojoin	lwt.h	/^	lwt_flags_t lwt_nojoin;	$/;"	m	struct:_lwt_t
 lwt_rcv	lwt.c	/^*lwt_rcv(lwt_chan_t c)$/;"	f
 lwt_rcv_chan	lwt.c	/^lwt_rcv_chan(lwt_chan_t c)$/;"	f
 lwt_snd	lwt.c	/^lwt_snd(lwt_chan_t c, void *data)$/;"	f
@@ -135,6 +141,7 @@ nsnding_counter	lwt.h	/^	uint nsnding_counter;$/;"	m	struct:_global_counter_t
 num	lwt.h	/^	int num;	$/;"	m	struct:ring_buffer
 p	ps_list.h	/^	struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::
 pool	lwt.c	/^void *pool;$/;"	v
+pool_cgrp_head	lwt.c	/^lwt_cgrp_t pool_cgrp_head;$/;"	v
 pool_chan_head	lwt.c	/^lwt_chan_t pool_chan_head;$/;"	v
 pool_clist_head	lwt.c	/^clist_t pool_clist_head;$/;"	v
 pool_head	lwt.c	/^lwt_t pool_head;$/;"	v
@@ -177,11 +184,6 @@ ps_list_rem_d	ps_list.h	154;"	d
 ps_list_singleton	ps_list.h	126;"	d
 ps_list_singleton_d	ps_list.h	148;"	d
 ps_offsetof	ps_list.h	100;"	d
-rbIsEmpty	lwt.c	/^int rbIsEmpty(ring_buffer* rb) $/;"	f
-rbIsFull	lwt.c	/^int rbIsFull(ring_buffer* rb) $/;"	f
-rb_add	lwt.c	/^void rb_add(ring_buffer* rb, void* data) $/;"	f
-rb_get	lwt.c	/^void* rb_get(ring_buffer* rb) $/;"	f
-rb_init	lwt.c	/^void rb_init(ring_buffer* rb, int size) $/;"	f
 rcv_blocked	lwt.h	/^	int rcv_blocked;$/;"	m	struct:lwt_channel
 rcv_thd	lwt.h	/^	lwt_t rcv_thd;	 			\/* the receiver *\/$/;"	m	struct:lwt_channel
 rdtscll	main1.c	7;"	d	file:
@@ -200,7 +202,7 @@ snd_thds	lwt.h	/^	clist_t snd_thds;$/;"	m	struct:lwt_channel
 sp	lwt.h	/^	ulong sp;$/;"	m	struct:_lwt_t
 sp	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
 start	lwt.h	/^	int start;$/;"	m	struct:ring_buffer
-status	lwt.h	/^	lwt_status_t status;	$/;"	m	struct:_lwt_t
+status	lwt.h	/^	lwt_status_t status;$/;"	m	struct:_lwt_t
 target	lwt.h	/^	struct _lwt_t *target;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
 test	test.c	/^void *test()$/;"	f
 test1	test.c	/^void *test1()$/;"	f

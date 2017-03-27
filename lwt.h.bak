@@ -124,7 +124,7 @@ lwt_t lwt_head;
 
 global_counter_t gcounter;
 
-lwt_t lwt_create(lwt_fn_t fn, void *data);
+lwt_t lwt_create(lwt_fn_t fn, void *data, int t);
 void *lwt_join(lwt_t thread);
 void lwt_die(void *data);
 int lwt_yield(lwt_t lwt);

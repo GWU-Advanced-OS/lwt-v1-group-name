@@ -12,6 +12,8 @@
 #define STACK_SIZE 4096
 #endif
 
+#define RING_SIZE 32
+
 #define LWT_NULL NULL
 
 typedef unsigned long ulong;
@@ -37,15 +39,21 @@ typedef enum
 	LWT_WAITING,
 }lwt_status_t;
 
+typedef enum
+{
+	LWT_JOIN,
+	LWT_NOJOIN,
+}lwt_flags_t;
+
 typedef struct _lwt_t
 {
 	ulong ip;
 	ulong sp;
-	ulong bsp;
 	uint id;
-	lwt_status_t status;	
+	lwt_status_t status;
+	lwt_flags_t lwt_nojoin;	
 	lwt_fn_t fn;
-	void *data;
+	void* data;
 	void *return_val;
 	struct _lwt_t *joiner;
 	struct _lwt_t *target;
@@ -75,6 +83,8 @@ typedef struct _global_counter_t
 	uint avail_chan_counter;
 	/*counter for available clist*/
 	uint avail_clist_counter;
+	/*counter for available cgrp*/
+	uint avail_cgrp_counter;
 }global_counter_t;
 
 typedef struct ring_buffer {
@@ -82,7 +92,7 @@ typedef struct ring_buffer {
 	int start;
 	int end;
 	int num;	
-	void** data;  
+	void* data[RING_SIZE];  
 } ring_buffer;
 
 typedef struct cgroup
@@ -90,8 +100,8 @@ typedef struct cgroup
 	int id;
 	int n_chan;          //number of channels in the group
 	//the channel that ready to receive, point to the head of the event queue   
-	struct lwt_channel *events;  
-
+	struct lwt_channel *events;
+  	struct ps_list list;	
 } cgroup, *lwt_cgrp_t;
 
 typedef struct clist_head
@@ -107,6 +117,7 @@ typedef struct lwt_channel
 	/* sender’s data */
 	int snd_cnt; 				/* number of sending threads */
 	clist_t snd_thds;
+//	struct ps_list_head snd_head;	
 	/* receiver’s data */
 	int rcv_blocked;
 	lwt_t rcv_thd;	 			/* the receiver */
@@ -124,9 +135,12 @@ typedef void *(*lwt_chan_fn_t)(lwt_chan_t);
 /* head of the queue of  thread*/
 lwt_t lwt_head;
 
+lwt_t lwt_curr;
+//lwt_t lwt_inactive_head;
+
 global_counter_t gcounter;
 
-lwt_t lwt_create(lwt_fn_t fn, void *data);
+lwt_t lwt_create(lwt_fn_t fn, void *data, lwt_flags_t flags);
 void *lwt_join(lwt_t thread);
 void lwt_die(void *data);
 int lwt_yield(lwt_t lwt);
@@ -135,6 +149,13 @@ int lwt_id(lwt_t lwt);
 int lwt_info(lwt_info_t t);
 void __lwt_start();
 void *__lwt_stack_get(void);
+lwt_chan_t lwt_chan(int sz);
+void lwt_chan_deref(lwt_chan_t c);
+int lwt_snd(lwt_chan_t c,void *data);
+void *lwt_rcv(lwt_chan_t c);
+int lwt_snd_chan(lwt_chan_t c,lwt_chan_t sending);
+lwt_chan_t lwt_rcv_chan(lwt_chan_t c);
+lwt_t lwt_create_chan(lwt_chan_fn_t fn, lwt_chan_t c);
 lwt_cgrp_t lwt_cgrp(void);
 int lwt_cgrp_free(lwt_cgrp_t cgrp);
 int lwt_cgrp_add(lwt_cgrp_t cgrp, lwt_chan_t c);
