@@ -6,7 +6,7 @@
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 DEBUG	lwt.h	7;"	d
 IS_RESET	main1.c	73;"	d	file:
-IS_RESET	main2.c	41;"	d	file:
+IS_RESET	main2.c	40;"	d	file:
 ITER	main1.c	9;"	d	file:
 ITER	main2.c	8;"	d	file:
 LWT_ACTIVE	lwt.h	/^	LWT_ACTIVE,$/;"	e	enum:__anon2
@@ -21,12 +21,15 @@ LWT_INFO_NTHD_RUNNABLE	lwt.h	/^	LWT_INFO_NTHD_RUNNABLE,$/;"	e	enum:__anon1
 LWT_INFO_NTHD_ZOMBIES	lwt.h	/^	LWT_INFO_NTHD_ZOMBIES,$/;"	e	enum:__anon1
 LWT_JOIN	lwt.h	/^	LWT_JOIN,$/;"	e	enum:__anon3
 LWT_NOJOIN	lwt.h	/^	LWT_NOJOIN,$/;"	e	enum:__anon3
-LWT_NULL	lwt.h	15;"	d
+LWT_NULL	lwt.h	17;"	d
 LWT_WAITING	lwt.h	/^	LWT_WAITING,$/;"	e	enum:__anon2
 PS_LIST_DEF_NAME	ps_list.h	65;"	d
 PS_LIST_H	ps_list.h	50;"	d
+RING_SIZE	lwt.h	15;"	d
 STACK_SIZE	lwt.h	12;"	d
 _LWT_H	lwt.h	3;"	d
+__cgrp_get	lwt.c	/^*__cgrp_get()$/;"	f
+__cgrp_return	lwt.c	/^__cgrp_return(void *cgrp)$/;"	f
 __channel_get	lwt.c	/^*__channel_get()$/;"	f
 __channel_return	lwt.c	/^__channel_return(void *chan)$/;"	f
 __clist_get	lwt.c	/^*__clist_get()$/;"	f
@@ -47,7 +50,6 @@ avail_chan_counter	lwt.h	/^	uint avail_chan_counter;$/;"	m	struct:_global_counte
 avail_clist_counter	lwt.h	/^	uint avail_clist_counter;$/;"	m	struct:_global_counter_t
 avail_counter	lwt.h	/^	uint avail_counter;$/;"	m	struct:_global_counter_t
 blocked_counter	lwt.h	/^	uint blocked_counter;$/;"	m	struct:_global_counter_t
-bsp	lwt.h	/^	ulong bsp;$/;"	m	struct:_lwt_t
 cgroup	lwt.h	/^typedef struct cgroup$/;"	s
 cgroup	lwt.h	/^} cgroup, *lwt_cgrp_t;$/;"	t	typeref:struct:cgroup
 cgrp	lwt.h	/^	lwt_cgrp_t cgrp;		\/\/ belongs to which group$/;"	m	struct:lwt_channel
@@ -56,13 +58,13 @@ clist_head	lwt.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
 clist_t	lwt.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
 curr	main1.c	/^volatile int curr = 0;$/;"	v
 curr	main2.c	/^volatile int curr = 0;$/;"	v
-data	lwt.h	/^	void *data;$/;"	m	struct:_lwt_t
+data	lwt.h	/^	void* data;$/;"	m	struct:_lwt_t
 data	lwt.h	/^	void* data;$/;"	m	struct:clist_head
-data	lwt.h	/^	void** data;  $/;"	m	struct:ring_buffer
+data	lwt.h	/^	void* data[RING_SIZE];  $/;"	m	struct:ring_buffer
 data_buffer	lwt.h	/^	ring_buffer data_buffer;$/;"	m	struct:lwt_channel
 died_counter	lwt.h	/^	uint died_counter;$/;"	m	struct:_global_counter_t
 end	lwt.h	/^	int end;$/;"	m	struct:ring_buffer
-events	lwt.h	/^	struct lwt_channel *events;  $/;"	m	struct:cgroup	typeref:struct:cgroup::lwt_channel
+events	lwt.h	/^	struct lwt_channel *events;$/;"	m	struct:cgroup	typeref:struct:cgroup::lwt_channel
 flag	test.c	/^int flag=0;$/;"	v
 fn	lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:_lwt_t
 fn_bounce	main1.c	/^fn_bounce(void *d) $/;"	f
@@ -91,9 +93,10 @@ l	ps_list.h	/^	struct ps_list l;$/;"	m	struct:ps_list_head	typeref:struct:ps_lis
 list	lwt.h	/^	struct ps_list list;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::ps_list
 list	lwt.h	/^	struct ps_list list;$/;"	m	struct:clist_head	typeref:struct:clist_head::ps_list
 list	lwt.h	/^	struct ps_list list;$/;"	m	struct:lwt_channel	typeref:struct:lwt_channel::ps_list
-lwt_cgrp	lwt.c	/^lwt_cgrp_t lwt_cgrp(void)$/;"	f
+list	lwt.h	/^  	struct ps_list list;	$/;"	m	struct:cgroup	typeref:struct:cgroup::ps_list
+lwt_cgrp	lwt.c	/^lwt_cgrp(void)$/;"	f
 lwt_cgrp_add	lwt.c	/^int lwt_cgrp_add(lwt_cgrp_t cgrp, lwt_chan_t c)$/;"	f
-lwt_cgrp_free	lwt.c	/^int lwt_cgrp_free(lwt_cgrp_t cgrp)$/;"	f
+lwt_cgrp_free	lwt.c	/^lwt_cgrp_free(lwt_cgrp_t cgrp)$/;"	f
 lwt_cgrp_rem	lwt.c	/^int lwt_cgrp_rem(lwt_cgrp_t cgrp, lwt_chan_t c)$/;"	f
 lwt_cgrp_t	lwt.h	/^} cgroup, *lwt_cgrp_t;$/;"	t	typeref:struct:cgroup
 lwt_cgrp_wait	lwt.c	/^lwt_chan_t lwt_cgrp_wait(lwt_cgrp_t cgrp)$/;"	f
@@ -141,10 +144,10 @@ nsnding_counter	lwt.h	/^	uint nsnding_counter;$/;"	m	struct:_global_counter_t
 num	lwt.h	/^	int num;	$/;"	m	struct:ring_buffer
 p	ps_list.h	/^	struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::
 pool	lwt.c	/^void *pool;$/;"	v
-pool_cgrp_head	lwt.c	/^lwt_cgrp_t pool_cgrp_head;$/;"	v
-pool_chan_head	lwt.c	/^lwt_chan_t pool_chan_head;$/;"	v
-pool_clist_head	lwt.c	/^clist_t pool_clist_head;$/;"	v
-pool_head	lwt.c	/^lwt_t pool_head;$/;"	v
+pool_cgrp_head	lwt.c	/^struct ps_list_head pool_cgrp_head;$/;"	v	typeref:struct:ps_list_head
+pool_chan_head	lwt.c	/^struct ps_list_head pool_chan_head;$/;"	v	typeref:struct:ps_list_head
+pool_clist_head	lwt.c	/^struct ps_list_head pool_clist_head;$/;"	v	typeref:struct:ps_list_head
+pool_head	lwt.c	/^struct ps_list_head pool_head;$/;"	v	typeref:struct:ps_list_head
 ps_container	ps_list.h	103;"	d
 ps_list	ps_list.h	/^struct ps_list {$/;"	s
 ps_list_add	ps_list.h	130;"	d

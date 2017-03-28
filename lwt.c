@@ -95,16 +95,19 @@ void
 			if(lwt == NULL)
 				assert(0);
 		}
-
-		return lwt;
 	}
 	else
 	{
-		lwt = ps_list_head_last(&pool_head, struct _lwt_t, list);		
+//		lwt = ps_list_head_last(&pool_head, struct _lwt_t, list);
+		lwt = (lwt_t)((char *)pool_head.l.p - sizeof(struct _lwt_t) + sizeof(struct ps_list));
+//		printf("lwt adrr %ld, cal adrr %ld, struct size %d\n",(ulong)lwt,(ulong)temp,sizeof(struct _lwt_t));		
+//		void *a=1;
+//		char *b;
+//		printf("void %ld, char %ld\n",pool_head.l.p, (char *)pool_head.l.p);
 		ps_list_rem_d(lwt);
 		gcounter.avail_counter--;
-		return lwt;
 	}	
+	return lwt;
 }
 
 void 
@@ -166,18 +169,18 @@ lwt_join(lwt_t lwt)
 		return NULL;
 	lwt_head->joiner = lwt;
 	lwt->target = lwt_head;
-//	lwt_chan_t c = lwt_chan(1);
-//	c->snd_cnt = 1;
-//	lwt_head->data = c;
-//	lwt_rcv(c);
 	if(lwt->status == LWT_ACTIVE)
 	{
 		lwt_head->status = LWT_BLOCKED;
 		gcounter.blocked_counter++;
 		gcounter.runable_counter--;
 		lwt_yield(lwt);
+		/*lwt_chan_t c = lwt_chan(0);
+		c->snd_cnt = 1;
+		lwt_head->data = c;
+		lwt_rcv(c);
+		lwt_chan_deref(c);*/
 	}
-//DEBUG();
 	temp_data = lwt->return_val;
 	ps_list_rem_d(lwt);
 	__lwt_stack_return(lwt);
@@ -201,7 +204,8 @@ lwt_die(void *data)
 		gcounter.blocked_counter--;
 		lwt_head->target->status = LWT_ACTIVE;
 		gcounter.runable_counter++;
-		//lwt_snd((lwt_chan_t)lwt_head->target->data,(void *)1);
+		/*lwt_snd((lwt_chan_t)lwt_head->target->data,(void *)1);
+		lwt_chan_deref((lwt_chan_t)lwt_head->target->data);*/
 	}
 		
 	lwt_head->return_val = (void *)data;
@@ -353,7 +357,6 @@ lwt_chan(int sz)
 	new->data_buffer.num = 0;
 	new->snd_cnt = 0;
 	new->snd_thds = NULL;
-//	ps_list_head_init(&new->snd_head);
 	new->id = gcounter.nchan_id++;
 	gcounter.nchan_counter++;
 	new->rcv_thd = lwt_head;
@@ -385,7 +388,6 @@ lwt_chan_deref(lwt_chan_t c)
 	{
 		assert(0);
 	}
-	return;
 }
 
 int 
@@ -449,7 +451,6 @@ lwt_snd(lwt_chan_t c, void *data)
 	}
 
 	c->rcv_thd->status = LWT_ACTIVE;
-//	__change_status(c->rcv_thd, LWT_ACTIVE);
 	gcounter.nsnding_counter--;
 	gcounter.runable_counter++;
 	return 0;
@@ -473,14 +474,9 @@ void
 		//if snd_thds is null, block the reciever to wait for sender
 		while (c->snd_thds == NULL)//ps_list_head_empty(&c->snd_head)) 
 		{
-			lwt_yield(LWT_NULL);
-						
+			lwt_yield(LWT_NULL);						
 		}
 
-/*		clist_t tmp = ps_list_head_last(&c->snd_head, struct clist_head, list);
-		temp = tmp->data;
-		ps_list_rem_d(tmp);
-		__clist_return(tmp);*/
 		temp = c->snd_thds->data;
 		if(ps_list_singleton_d(c->snd_thds))
 		{
@@ -589,16 +585,18 @@ void
 		else
 		{
 			c = malloc(size);
+			if(c == NULL)
+				assert(c);
 		}
-		return c;
 	}
 	else
 	{
-		c = ps_list_head_last(&pool_chan_head, struct lwt_channel, list);		
+		//c = ps_list_head_last(&pool_chan_head, struct lwt_channel, list);		
+		c = (lwt_chan_t)((char *)pool_chan_head.l.p - sizeof(struct lwt_channel) + sizeof(struct ps_list));
 		ps_list_rem_d(c);
 		gcounter.avail_chan_counter--;
-		return c;
 	}	
+	return c;
 }
 
 void 
@@ -624,16 +622,18 @@ void
 		else
 		{
 			c = malloc(size);															
+			if(c == NULL)
+				assert(0);
 		}
-		return c;
 	}
 	else
 	{
-		c = ps_list_head_last(&pool_clist_head, struct clist_head, list);		
+		//c = ps_list_head_last(&pool_clist_head, struct clist_head, list);		
+		c = (clist_t)((char *)pool_clist_head.l.p - sizeof(struct clist_head) + sizeof(struct ps_list));
 		ps_list_rem_d(c);
 		gcounter.avail_clist_counter--;
-		return c;										
 	}	
+	return c;
 }
 
 void 
@@ -659,16 +659,18 @@ void
 		else
 		{
 			c = malloc(size);															
+			if(c == NULL)
+				assert(0);
 		}
-		return c;
 	}
 	else
 	{
-		c = ps_list_head_last(&pool_cgrp_head, struct cgroup, list);		
+		//c = ps_list_head_last(&pool_cgrp_head, struct cgroup, list);		
+		c = (lwt_cgrp_t)((char *)pool_cgrp_head.l.p - sizeof(struct cgroup) + sizeof(struct ps_list));
 		ps_list_rem_d(c);
 		gcounter.avail_cgrp_counter--;
-		return c;										
 	}	
+	return c;
 }
 
 void 

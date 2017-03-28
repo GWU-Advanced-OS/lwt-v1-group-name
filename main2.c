@@ -28,7 +28,6 @@ fn_bounce(void *d)
 	rdtscll(end);
 	lwt_yield(LWT_NULL);
 	lwt_yield(LWT_NULL);
-
 	if (!d) printf("[PERF] %5lld <- yield\n", (end-start)/(ITER*2));
 
 	return NULL;
@@ -122,7 +121,6 @@ test_crt_join_sched(void)
 	lwt_t chld1, chld2;
 
 	printf("[TEST] thread creation/join/scheduling\n");
-
 	/* functional tests: scheduling */
 	lwt_yield(LWT_NULL);
 
