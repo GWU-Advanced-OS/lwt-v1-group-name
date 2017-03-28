@@ -101,9 +101,9 @@ void
 //		lwt = ps_list_head_last(&pool_head, struct _lwt_t, list);
 		lwt = (lwt_t)((char *)pool_head.l.p - sizeof(struct _lwt_t) + sizeof(struct ps_list));
 //		printf("lwt adrr %ld, cal adrr %ld, struct size %d\n",(ulong)lwt,(ulong)temp,sizeof(struct _lwt_t));		
-//		void *a=1;
-//		char *b;
-//		printf("void %ld, char %ld\n",pool_head.l.p, (char *)pool_head.l.p);
+//		void *a = (lwt_t)(pool_head.l.p - sizeof(struct _lwt_t) + sizeof(struct ps_list));
+//		printf("void %d, char %d\n",*pool_head.l.p, *(char *)pool_head.l.p);
+//		printf("lwt void %d, lwt char %d\n",a, lwt);
 		ps_list_rem_d(lwt);
 		gcounter.avail_counter--;
 	}	
@@ -428,8 +428,15 @@ lwt_snd(lwt_chan_t c, void *data)
 	}
 	else
 	{
+		while(c->data_buffer.num == c->data_buffer.size) 
+		{
+			lwt_yield(LWT_NULL);							
+		}	
+		c->data_buffer.data[c->data_buffer.end] = data;
+		c->data_buffer.end = (c->data_buffer.end + 1)%c->data_buffer.size;
+		c->data_buffer.num++;
 		//add the event
-		if (c->iscgrp) 
+		if (c->iscgrp && 1 == c->data_buffer.num) 
 		{
 			if(c->cgrp->events == NULL)
 			{
@@ -441,13 +448,6 @@ lwt_snd(lwt_chan_t c, void *data)
 				ps_list_add_d(ps_list_prev_d(c->cgrp->events),c);
 			}
 		}
-		while(c->data_buffer.num == c->data_buffer.size) 
-		{
-			lwt_yield(LWT_NULL);							
-		}	
-		c->data_buffer.data[c->data_buffer.end] = data;
-		c->data_buffer.end = (c->data_buffer.end + 1)%c->data_buffer.size;
-		c->data_buffer.num++;
 	}
 
 	c->rcv_thd->status = LWT_ACTIVE;
@@ -502,7 +502,7 @@ void
 		c->data_buffer.start = (c->data_buffer.start + 1)%c->data_buffer.size;
 		c->data_buffer.num--;
 
-		if (c->cgrp != NULL) 
+		if (c->iscgrp && 0 == c->data_buffer.num) 
 		{
 			if(c->cgrp->events != NULL) 
 			{
