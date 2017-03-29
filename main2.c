@@ -208,12 +208,65 @@ test_perf_channels(int chsz)
 	lwt_join(t);
 }
 
+void *
+fn_grpwait(void *d)
+{
+	lwt_chan_t c = d;
+	int i;
+
+	for (i = 0 ; i < ITER ; i++) {
+		lwt_snd(c, (void*)lwt_id(lwt_current()));
+	}
+}
+
+#define GRPSZ 3
+
+void
+test_cgrpwait(int chsz, int grpsz)
+{
+	lwt_chan_t c[grpsz];
+	lwt_t lwt[grpsz];
+	int i;
+	lwt_cgrp_t cgrp;
+
+	printf("[TEST] group wait (channel buffer size %d, grpsz %d)\n", 
+	       chsz, grpsz);
+	cgrp = lwt_cgrp();
+	assert(cgrp);
+	
+	for (i = 0 ; i < grpsz ; i++) {
+		c[i] = lwt_chan(chsz);
+		assert(c[i]);
+		lwt[i] = lwt_create(fn_grpwait, c[i], 1);
+		lwt_chan_mark_set(c[i], (void*)lwt_id(lwt[i]));
+		lwt_cgrp_add(cgrp, c[i]);
+	}
+	assert(lwt_cgrp_free(cgrp) == -1);
+
+	for (i = 0 ; i < ((ITER * grpsz)) ; i++) {
+		lwt_chan_t cc;
+		int r;
+
+		cc = lwt_cgrp_wait(cgrp);
+		assert(c);
+		r = (int)lwt_rcv(cc);
+		assert(r == (int)lwt_chan_mark_get(cc));
+	}
+	for (i = 0 ; i < grpsz ; i++) {
+		lwt_cgrp_rem(cgrp, c[i]);
+		lwt_chan_deref(c[i]);
+	}
+	assert(lwt_cgrp_free(cgrp) == 0);
+	
+	return;
+}
 int
 main(void)
 {
 	test_perf();
 	test_crt_join_sched();
 	test_perf_channels(0);
-
+	test_cgrpwait(0, 4);
+	test_cgrpwait(5, 5);
 	return 0;
 }

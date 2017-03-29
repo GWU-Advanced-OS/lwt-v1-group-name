@@ -5,10 +5,14 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 DEBUG	lwt.h	7;"	d
+GRPSZ	main2.c	331;"	d	file:
+GRPSZ	main3.c	343;"	d	file:
 IS_RESET	main1.c	73;"	d	file:
 IS_RESET	main2.c	40;"	d	file:
+IS_RESET	main3.c	47;"	d	file:
 ITER	main1.c	9;"	d	file:
 ITER	main2.c	8;"	d	file:
+ITER	main3.c	8;"	d	file:
 LWT_ACTIVE	lwt.h	/^	LWT_ACTIVE,$/;"	e	enum:__anon2
 LWT_BLOCKED	lwt.h	/^	LWT_BLOCKED,$/;"	e	enum:__anon2
 LWT_DEAD	lwt.h	/^	LWT_DEAD,$/;"	e	enum:__anon2
@@ -45,11 +49,15 @@ __lwt_stack_return	lwt.c	/^__lwt_stack_return(void *lwt)$/;"	f
 __lwt_start	lwt.c	/^__lwt_start()$/;"	f
 _global_counter_t	lwt.h	/^typedef struct _global_counter_t$/;"	s
 _lwt_t	lwt.h	/^typedef struct _lwt_t$/;"	s
+async_sz	main2.c	/^static int async_sz = 0;$/;"	v	file:
+async_sz	main3.c	/^static int async_sz = 0;$/;"	v	file:
 avail_cgrp_counter	lwt.h	/^	uint avail_cgrp_counter;$/;"	m	struct:_global_counter_t
 avail_chan_counter	lwt.h	/^	uint avail_chan_counter;$/;"	m	struct:_global_counter_t
 avail_clist_counter	lwt.h	/^	uint avail_clist_counter;$/;"	m	struct:_global_counter_t
 avail_counter	lwt.h	/^	uint avail_counter;$/;"	m	struct:_global_counter_t
 blocked_counter	lwt.h	/^	uint blocked_counter;$/;"	m	struct:_global_counter_t
+c	main2.c	/^	lwt_chan_t c;$/;"	m	struct:multisend_arg	file:
+c	main3.c	/^	lwt_chan_t c;$/;"	m	struct:multisend_arg	file:
 cgroup	lwt.h	/^typedef struct cgroup$/;"	s
 cgroup	lwt.h	/^} cgroup, *lwt_cgrp_t;$/;"	t	typeref:struct:cgroup
 cgrp	lwt.h	/^	lwt_cgrp_t cgrp;		\/\/ belongs to which group$/;"	m	struct:lwt_channel
@@ -58,6 +66,7 @@ clist_head	lwt.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
 clist_t	lwt.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
 curr	main1.c	/^volatile int curr = 0;$/;"	v
 curr	main2.c	/^volatile int curr = 0;$/;"	v
+curr	main3.c	/^volatile int curr = 0;$/;"	v
 data	lwt.h	/^	void* data;$/;"	m	struct:_lwt_t
 data	lwt.h	/^	void* data;$/;"	m	struct:clist_head
 data	lwt.h	/^	void* data[RING_SIZE];  $/;"	m	struct:ring_buffer
@@ -67,19 +76,32 @@ end	lwt.h	/^	int end;$/;"	m	struct:ring_buffer
 events	lwt.h	/^	struct lwt_channel *events;$/;"	m	struct:cgroup	typeref:struct:cgroup::lwt_channel
 flag	test.c	/^int flag=0;$/;"	v
 fn	lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:_lwt_t
+fn_async_steam	main2.c	/^fn_async_steam(void *data)$/;"	f
+fn_async_steam	main3.c	/^fn_async_steam(void *data)$/;"	f
 fn_bounce	main1.c	/^fn_bounce(void *d) $/;"	f
 fn_bounce	main2.c	/^fn_bounce(void *d) $/;"	f
+fn_bounce	main3.c	/^fn_bounce(void *d) $/;"	f
 fn_chan	main2.c	/^fn_chan(lwt_chan_t to)$/;"	f
+fn_chan	main3.c	/^fn_chan(void *data)$/;"	f
+fn_grpwait	main2.c	/^fn_grpwait(void *d)$/;"	f
+fn_grpwait	main3.c	/^fn_grpwait(void *d)$/;"	f
 fn_identity	main1.c	/^fn_identity(void *d)$/;"	f
 fn_identity	main2.c	/^fn_identity(void *d)$/;"	f
+fn_identity	main3.c	/^fn_identity(void *d)$/;"	f
 fn_join	main1.c	/^fn_join(void *d)$/;"	f
 fn_join	main2.c	/^fn_join(void *d)$/;"	f
+fn_join	main3.c	/^fn_join(void *d)$/;"	f
 fn_nested_joins	main1.c	/^fn_nested_joins(void *d)$/;"	f
 fn_nested_joins	main2.c	/^fn_nested_joins(void *d)$/;"	f
+fn_nested_joins	main3.c	/^fn_nested_joins(void *d)$/;"	f
 fn_null	main1.c	/^fn_null(void *d)$/;"	f
 fn_null	main2.c	/^fn_null(void *d)$/;"	f
+fn_null	main3.c	/^fn_null(void *d)$/;"	f
 fn_sequence	main1.c	/^fn_sequence(void *d)$/;"	f
 fn_sequence	main2.c	/^fn_sequence(void *d)$/;"	f
+fn_sequence	main3.c	/^fn_sequence(void *d)$/;"	f
+fn_snder	main2.c	/^fn_snder(void *arg)$/;"	f
+fn_snder	main3.c	/^fn_snder(void *arg)$/;"	f
 gcounter	lwt.h	/^global_counter_t gcounter;$/;"	v
 global_counter_t	lwt.h	/^}global_counter_t;$/;"	t	typeref:struct:_global_counter_t
 id	lwt.h	/^	int id;     \/* channel's id*\/$/;"	m	struct:lwt_channel
@@ -132,9 +154,12 @@ lwt_t	lwt.h	/^}*lwt_t;$/;"	t	typeref:struct:_lwt_t
 lwt_yield	lwt.c	/^lwt_yield(lwt_t lwt)$/;"	f
 main	main1.c	/^main(void)$/;"	f
 main	main2.c	/^main(void)$/;"	f
+main	main3.c	/^main(void)$/;"	f
 main	test.c	/^void main()$/;"	f
 main	test1.c	/^void main()$/;"	f
 mark	lwt.h	/^	void *mark;$/;"	m	struct:lwt_channel
+multisend_arg	main2.c	/^struct multisend_arg {$/;"	s	file:
+multisend_arg	main3.c	/^struct multisend_arg {$/;"	s	file:
 n	ps_list.h	/^	struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::ps_list
 n_chan	lwt.h	/^	int n_chan;          \/\/number of channels in the group$/;"	m	struct:cgroup
 nchan_counter	lwt.h	/^	uint nchan_counter;$/;"	m	struct:_global_counter_t
@@ -191,6 +216,7 @@ rcv_blocked	lwt.h	/^	int rcv_blocked;$/;"	m	struct:lwt_channel
 rcv_thd	lwt.h	/^	lwt_t rcv_thd;	 			\/* the receiver *\/$/;"	m	struct:lwt_channel
 rdtscll	main1.c	7;"	d	file:
 rdtscll	main2.c	6;"	d	file:
+rdtscll	main3.c	6;"	d	file:
 rest_pool	lwt.c	/^ulong rest_pool;$/;"	v
 return_val	lwt.h	/^	void *return_val;$/;"	m	struct:_lwt_t
 ring_buffer	lwt.h	/^typedef struct ring_buffer {$/;"	s
@@ -198,10 +224,15 @@ ring_buffer	lwt.h	/^} ring_buffer;$/;"	t	typeref:struct:ring_buffer
 runable_counter	lwt.h	/^	uint runable_counter;$/;"	m	struct:_global_counter_t
 sched	main1.c	/^volatile int sched[2] = {0, 0};$/;"	v
 sched	main2.c	/^volatile int sched[2] = {0, 0};$/;"	v
+sched	main3.c	/^volatile int sched[2] = {0, 0};$/;"	v
 size	lwt.h	/^	int size;				\/\/ size of the buffer$/;"	m	struct:lwt_channel
 size	lwt.h	/^	int size;$/;"	m	struct:ring_buffer
 snd_cnt	lwt.h	/^	int snd_cnt; 				\/* number of sending threads *\/$/;"	m	struct:lwt_channel
 snd_thds	lwt.h	/^	clist_t snd_thds;$/;"	m	struct:lwt_channel
+snd_val	main2.c	/^	int snd_val;$/;"	m	struct:multisend_arg	file:
+snd_val	main3.c	/^	int snd_val;$/;"	m	struct:multisend_arg	file:
+sndrcv_cnt	main2.c	/^static int sndrcv_cnt = 0;$/;"	v	file:
+sndrcv_cnt	main3.c	/^static int sndrcv_cnt = 0;$/;"	v	file:
 sp	lwt.h	/^	ulong sp;$/;"	m	struct:_lwt_t
 sp	lwt_dispatch.h	/^	unsigned long ip, sp;$/;"	m	struct:lwt_context
 start	lwt.h	/^	int start;$/;"	m	struct:ring_buffer
@@ -211,9 +242,18 @@ test	test.c	/^void *test()$/;"	f
 test1	test.c	/^void *test1()$/;"	f
 test_crt_join_sched	main1.c	/^test_crt_join_sched(void)$/;"	f
 test_crt_join_sched	main2.c	/^test_crt_join_sched(void)$/;"	f
+test_crt_join_sched	main3.c	/^test_crt_join_sched(void)$/;"	f
+test_grpwait	main2.c	/^test_grpwait(int chsz, int grpsz)$/;"	f
+test_grpwait	main3.c	/^test_grpwait(int chsz, int grpsz)$/;"	f
+test_multisend	main2.c	/^test_multisend(int chsz)$/;"	f
+test_multisend	main3.c	/^test_multisend(int chsz)$/;"	f
 test_perf	main1.c	/^test_perf(void)$/;"	f
 test_perf	main2.c	/^test_perf(void)$/;"	f
+test_perf	main3.c	/^test_perf(void)$/;"	f
+test_perf_async_steam	main2.c	/^test_perf_async_steam(int chsz)$/;"	f
+test_perf_async_steam	main3.c	/^test_perf_async_steam(int chsz)$/;"	f
 test_perf_channels	main2.c	/^test_perf_channels(int chsz)$/;"	f
+test_perf_channels	main3.c	/^test_perf_channels(int chsz)$/;"	f
 thd	lwt.h	/^	lwt_t thd;$/;"	m	struct:clist_head
 thread	test1.c	/^void thread()$/;"	f
 thread1	test1.c	/^void thread1()$/;"	f

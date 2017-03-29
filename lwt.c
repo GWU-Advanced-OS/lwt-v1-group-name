@@ -98,12 +98,8 @@ void
 	}
 	else
 	{
-//		lwt = ps_list_head_last(&pool_head, struct _lwt_t, list);
 		lwt = (lwt_t)((char *)pool_head.l.p - sizeof(struct _lwt_t) + sizeof(struct ps_list));
-//		printf("lwt adrr %ld, cal adrr %ld, struct size %d\n",(ulong)lwt,(ulong)temp,sizeof(struct _lwt_t));		
 //		void *a = (lwt_t)(pool_head.l.p - sizeof(struct _lwt_t) + sizeof(struct ps_list));
-//		printf("void %d, char %d\n",*pool_head.l.p, *(char *)pool_head.l.p);
-//		printf("lwt void %d, lwt char %d\n",a, lwt);
 		ps_list_rem_d(lwt);
 		gcounter.avail_counter--;
 	}	
@@ -377,16 +373,11 @@ lwt_chan_deref(lwt_chan_t c)
 	{
 		c->snd_cnt--;
 	}
-	else if (c->rcv_thd->status == LWT_ACTIVE) 
+	else if (c->rcv_thd == lwt_curr && c->rcv_thd->status == LWT_ACTIVE) 
 	{
 		gcounter.nchan_counter--;
 		c->rcv_thd = NULL; 	//will also set "rcv_thd" as NULL
 		__channel_return(c);
-		return;
-	}
-	else
-	{
-		assert(0);
 	}
 }
 
@@ -425,6 +416,7 @@ lwt_snd(lwt_chan_t c, void *data)
 		{
 			ps_list_add_d(ps_list_prev_d(c->snd_thds),new_clist);															
 		}
+		c->data_buffer.num++;
 	}
 	else
 	{
@@ -435,18 +427,19 @@ lwt_snd(lwt_chan_t c, void *data)
 		c->data_buffer.data[c->data_buffer.end] = data;
 		c->data_buffer.end = (c->data_buffer.end + 1)%c->data_buffer.size;
 		c->data_buffer.num++;
-		//add the event
-		if (c->iscgrp && 1 == c->data_buffer.num) 
+
+	}
+	//add the event
+	if (c->iscgrp && 1 == c->data_buffer.num) 
+	{
+		if(c->cgrp->events == NULL)
 		{
-			if(c->cgrp->events == NULL)
-			{
-				ps_list_init_d(c);
-				c->cgrp->events = c;
-			}
-			else
-			{
-				ps_list_add_d(ps_list_prev_d(c->cgrp->events),c);
-			}
+			ps_list_init_d(c);
+			c->cgrp->events = c;
+		}
+		else
+		{
+			ps_list_add_d(ps_list_prev_d(c->cgrp->events),c);
 		}
 	}
 
@@ -490,6 +483,7 @@ void
 			ps_list_rem_d(tmp);
 			__clist_return(tmp);																								
 		}
+		c->data_buffer.num--;
 	}
 	else
 	{
@@ -502,22 +496,23 @@ void
 		c->data_buffer.start = (c->data_buffer.start + 1)%c->data_buffer.size;
 		c->data_buffer.num--;
 
-		if (c->iscgrp && 0 == c->data_buffer.num) 
-		{
-			if(c->cgrp->events != NULL) 
-			{
-				if(ps_list_singleton_d(c))
-				{
-					c->cgrp->events = NULL;
-				}
-				else
-				{
-					c->cgrp->events = ps_list_next_d(c);
-					ps_list_rem_d(c);
-				}
-			}			
-		} 
+
 	}
+	if (c->iscgrp && 0 == c->data_buffer.num) 
+	{
+		if(c->cgrp->events != NULL) 
+		{
+			if(ps_list_singleton_d(c))
+			{
+				c->cgrp->events = NULL;
+			}
+			else
+			{
+				c->cgrp->events = ps_list_next_d(c);
+				ps_list_rem_d(c);
+			}
+		}			
+	} 
 	gcounter.nrcving_counter--;
 	gcounter.runable_counter++;
 	c->rcv_thd->status = LWT_ACTIVE;
@@ -695,7 +690,7 @@ lwt_cgrp(void)
 int 
 lwt_cgrp_free(lwt_cgrp_t cgrp)
 {
-	if (cgrp->events = NULL)
+	if (NULL == cgrp->events && 0 == cgrp->n_chan)
 	{
 		__cgrp_return(cgrp);
 		return 0;							    
@@ -727,10 +722,12 @@ int lwt_cgrp_rem(lwt_cgrp_t cgrp, lwt_chan_t c)
 
 lwt_chan_t lwt_cgrp_wait(lwt_cgrp_t cgrp)
 {
+	lwt_curr->status = LWT_WAITING;
 	while (cgrp->events == NULL) 
 	{
 		lwt_yield(NULL);			    
 	}
+	lwt_curr->status = LWT_ACTIVE;
 	return cgrp->events;
 
 }

@@ -12,7 +12,7 @@
 #define STACK_SIZE 4096
 #endif
 
-#define RING_SIZE 32
+#define RING_SIZE 1024
 
 #define LWT_NULL NULL
 
