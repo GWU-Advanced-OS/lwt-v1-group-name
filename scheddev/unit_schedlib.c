@@ -304,14 +304,14 @@ fn_multiwait(lwt_chan_t c)
 {
 	int i;
 			
-	lwt_chan_t *cs = (lwt_chan_t*)kalloc(sizeof(lwt_chan_t)*30);
+	lwt_chan_t *cs = (lwt_chan_t*)kalloc(sizeof(lwt_chan_t)*10);
 				
 	lwt_cgrp_t g;
 	unsigned long long start, end;
 	g = lwt_cgrp();
 	assert(g);
 
-	for(i = 0; i < 30; i++)
+	for(i = 0; i < 10; i++)
 	{
 		cs[i] = lwt_chan(0);
 		lwt_chan_mark_set(cs[i], (cs[i])->id);
@@ -322,7 +322,7 @@ fn_multiwait(lwt_chan_t c)
 	assert(lwt_cgrp_free(g) == -1);
 
 	rdtscll(start);
-	for(i = 0 ; i < 10000 * 30; i++) 
+	for(i = 0 ; i < 10000 * 10; i++) 
 	{
 		lwt_chan_t c;
 		int r;
@@ -332,9 +332,9 @@ fn_multiwait(lwt_chan_t c)
 		assert(r == (int)lwt_chan_mark_get(c));
 	}
 	rdtscll(end);
-	printc("[PERF] %5lld <- multiwait (group size %d)\n", (end-start)/(10000*30), 100);
+	printc("[PERF] %5lld <- multiwait (group size %d)\n", (end-start)/(10000*10), 100);
 
-	for(i = 0 ; i < 30; i++) 
+	for(i = 0 ; i < 10; i++) 
 	{
 		lwt_cgrp_rem(g, cs[i]);
 		lwt_chan_deref(cs[i]);
