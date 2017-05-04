@@ -13,7 +13,7 @@ model name	: Intel(R) Core(TM) i5-4258U CPU @ 2.40GHz
 
 |     |                System&Param                |      context_switch(per thread)      | pipe/channel(per thread)  | proc/thd_create(per thread)  | event_notification(per thread)  |
 |-----|:------------------------------------------:|:------------------------:|:------------:|:---------------:|:------------------:|      |
-|           linux/lmbench(time:ms)           |      54.25   (1000threads)        |    51.2161(2 process)    |     188.2574    |       1.2477(100files)|
+| 1   |     linux/lmbench(time:ms)           |      54.25   (1000threads)        |    51.2161(2 process)    |     188.2574    |       1.2477(100files)|
 | 2   |             lwt_local hw3               |           43          |      150     |       233      |         2000       |
 | 3   |             lwt_local                   |          5071         |     932     |       7290      |        74490        |
 | 4   |             lwt_remote                  |         822071         |     415394    |      136831      |        12,119       |
