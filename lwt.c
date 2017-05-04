@@ -1,50 +1,24 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<assert.h>
-#include"lwt.h"
+#include"include/kalloc.h"
+#include"include/lwt.h"
 
 
 void __lwt_start();
 void __lwt_schedule(void);
 static inline void __lwt_dispatch(lwt_t curr, lwt_t next);	
-void *__lwt_stack_get(void);
-void __lwt_stack_return(void *stk);
 void __init_counter(void);
 void __init_thread_head(void);
-void __init_pool(void);
-void* __get_space_from_pool(int space_size);
-void* __channel_get();
-void __channel_return(void *chan);
-void* __clist_get();
-void __clist_return(void *clist);
 
 
 
-
-
-/*pool lwt  head*/
-struct ps_list_head pool_head;
-
-/*pool channel  head*/
-struct ps_list_head pool_chan_head;
-
-/*pool clist head*/
-struct ps_list_head pool_clist_head;
-
-/*pool cgrp head*/
-struct ps_list_head pool_cgrp_head;
-
-/*the pointer of the free pool*/
-void *pool;
-
-/*the number of free space in the pool*/
-ulong rest_pool;
-
-__attribute__((constructor())) void 
-__init()  
+void 
+lwt_init()  
 {  
-	__init_pool();
+	kinit();
 	__init_thread_head();
+
 
 }  	
 
@@ -52,76 +26,20 @@ __init()
 void
 __init_thread_head()
 {
-
-	lwt_head = __lwt_stack_get();
+	uint size = sizeof(struct _lwt_t) + STACK_SIZE;
+	lwt_head = (lwt_t) kalloc(size);
+	gcounter = (global_counter_t*)kalloc(sizeof(global_counter_t));
+	memset(gcounter,0,sizeof(global_counter_t));
+	assert(lwt_head);
 	ps_list_init_d(lwt_head);
 	lwt_head->ip = (ulong)0;
-	lwt_head->sp = (ulong)NULL;
-	lwt_head->id = gcounter.lwt_count++;
+	lwt_head->sp = (ulong)0;
+	lwt_head->id = gcounter->lwt_count++;
 	lwt_head->status = LWT_ACTIVE;
-	lwt_curr = lwt_head;
-	gcounter.runable_counter++;
+	//lwt_head->kthd = sl_thd_curr();
+//	lwt_head->tid = cos_thdid();
+	gcounter->runable_counter++;
 
-}
-
-void
-__init_pool()
-{
-	rest_pool = 5 * (sizeof(struct _lwt_t ) + STACK_SIZE + sizeof(struct lwt_channel) + sizeof(struct cgroup));
-	ps_list_head_init(&pool_head);
-	ps_list_head_init(&pool_chan_head);
-	ps_list_head_init(&pool_clist_head);
-	ps_list_head_init(&pool_cgrp_head);	
-	pool =  malloc(rest_pool);
-	if(pool == NULL)
-		assert(0);
-}
-
-void 
-*__lwt_stack_get()
-{
-	lwt_t lwt;
-	if(gcounter.avail_counter == 0)
-	{
-		uint size = sizeof(struct _lwt_t) + STACK_SIZE;
-		if(rest_pool >= size)
-		{	
-			lwt = __get_space_from_pool(size);
-			rest_pool -= size;
-		}
-		else
-		{
-			lwt = malloc(size);
-			if(lwt == NULL)
-				assert(0);
-		}
-	}
-	else
-	{
-		lwt = (lwt_t)((char *)pool_head.l.p - sizeof(struct _lwt_t) + sizeof(struct ps_list));
-//		void *a = (lwt_t)(pool_head.l.p - sizeof(struct _lwt_t) + sizeof(struct ps_list));
-		ps_list_rem_d(lwt);
-		gcounter.avail_counter--;
-	}	
-	return lwt;
-}
-
-void 
-__lwt_stack_return(void *lwt)
-{
-	assert(lwt);
-	ps_list_head_add_d(&pool_head,(lwt_t)lwt);
-	gcounter.avail_counter++;
-}
-
-void
-*__get_space_from_pool(int space_size)
-{
-	assert(rest_pool > 0);
-
-	void *tmp = pool;
-	pool = pool + space_size;
-	return tmp;
 }
 
 lwt_t 
@@ -133,21 +51,23 @@ lwt_create(lwt_fn_t fn, void *data, lwt_flags_t flags)
 	assert(fn);
 	
 	//malloc the new thread and stack
-
-
-	lwt_new = __lwt_stack_get();
-	lwt_new->id = gcounter.lwt_count++;
+	uint size = sizeof(struct _lwt_t) + STACK_SIZE;
+	lwt_new = (lwt_t) kalloc(size);
+	assert(lwt_new);
+	lwt_new->id = gcounter->lwt_count++;
 	lwt_new->ip = (ulong) (&__lwt_start);
-	lwt_new->sp = (ulong)lwt_new + sizeof(struct _lwt_t) + STACK_SIZE - 4; 		
+	lwt_new->sp = (ulong)lwt_new + size - 4; 		
 	lwt_new->status = LWT_ACTIVE;
 	lwt_new->lwt_nojoin = flags;
 	lwt_new->fn = fn;
 	lwt_new->data = data;
+	//lwt_new->kthd = sl_thd_curr();
+	//lwt_new->tid = cos_thdid();
 	lwt_new->joiner = NULL;
 	lwt_new->target = NULL;
 	lwt_new->return_val = NULL;
 
-	gcounter.runable_counter++;
+	gcounter->runable_counter++;
 
 	
 	ps_list_add_d(ps_list_prev_d(lwt_head),lwt_new);
@@ -168,8 +88,8 @@ lwt_join(lwt_t lwt)
 	if(lwt->status == LWT_ACTIVE)
 	{
 		lwt_head->status = LWT_BLOCKED;
-		gcounter.blocked_counter++;
-		gcounter.runable_counter--;
+		gcounter->blocked_counter++;
+		gcounter->runable_counter--;
 		lwt_yield(lwt);
 		/*lwt_chan_t c = lwt_chan(0);
 		c->snd_cnt = 1;
@@ -179,8 +99,8 @@ lwt_join(lwt_t lwt)
 	}
 	temp_data = lwt->return_val;
 	ps_list_rem_d(lwt);
-	__lwt_stack_return(lwt);
-	gcounter.died_counter--;
+	kfree((void *)lwt,sizeof(struct _lwt_t) + STACK_SIZE);
+	gcounter->died_counter--;
 
 	return temp_data;
 
@@ -197,29 +117,31 @@ lwt_die(void *data)
 
 	if(lwt_head->target != LWT_NULL)// && lwt_head->target->status == LWT_BLOCKED)
 	{
-		gcounter.blocked_counter--;
+		gcounter->blocked_counter--;
 		lwt_head->target->status = LWT_ACTIVE;
-		gcounter.runable_counter++;
+		gcounter->runable_counter++;
 		/*lwt_snd((lwt_chan_t)lwt_head->target->data,(void *)1);
 		lwt_chan_deref((lwt_chan_t)lwt_head->target->data);*/
 	}
 		
 	lwt_head->return_val = (void *)data;
-	gcounter.runable_counter--;
+	gcounter->runable_counter--;
 
 	if(lwt_head->lwt_nojoin)
 	{
+		lwt_t tmp_curr = lwt_head;
 		lwt_head = ps_list_next_d(lwt_head);
-		ps_list_rem_d(lwt_curr);
-		__lwt_stack_return(lwt_curr);
+		ps_list_rem_d(tmp_curr);
+		kfree((void *)tmp_curr,sizeof(struct _lwt_t) + STACK_SIZE);
+		__lwt_dispatch(tmp_curr,lwt_head);
 	}
 	else
 	{
 		lwt_head->status = LWT_DEAD;
-		gcounter.died_counter++;
+		gcounter->died_counter++;
+		__lwt_schedule();	
 	}
 
-	__lwt_schedule();	
 }
 
 int
@@ -232,9 +154,8 @@ lwt_yield(lwt_t lwt)
 	}
 	else if (lwt->status == LWT_ACTIVE)
 	{
-		lwt_t tmp_curr = lwt_curr;
+		lwt_t tmp_curr = lwt_head;
 		lwt_head = lwt;
-		lwt_curr = lwt_head;
 		__lwt_dispatch(tmp_curr,lwt_head);
 	}
 	return -1;
@@ -272,17 +193,19 @@ lwt_info(lwt_info_t t)
 {
 	switch (t) {
 		case LWT_INFO_NTHD_RUNNABLE:
-			return gcounter.runable_counter;
+			return gcounter->runable_counter;
 		case LWT_INFO_NTHD_BLOCKED:
-			return gcounter.blocked_counter;
+			return gcounter->blocked_counter;
 		case LWT_INFO_NTHD_ZOMBIES:
-			return gcounter.died_counter;							
+			return gcounter->died_counter;							
 		case LWT_INFO_NCHAN:
-			return gcounter.nchan_counter;							
+			return gcounter->nchan_counter;							
 		case LWT_INFO_NSNDING:
-			return gcounter.nsnding_counter;							
+			return gcounter->nsnding_counter;							
 		case LWT_INFO_NRCVING:
-			return gcounter.nrcving_counter;							
+			return gcounter->nrcving_counter;
+		default:
+			return -1;			
 
 	}
 }
@@ -291,20 +214,16 @@ lwt_info(lwt_info_t t)
 void 
 __lwt_start()
 {
-		
 	void *return_val = lwt_head->fn(lwt_head->data);
 	lwt_die(return_val);
-
 }
 
 void
 __lwt_schedule(void)
 {
 	lwt_t temp;
-
-	temp = lwt_curr;
-	if(lwt_curr == lwt_head)
-		lwt_head = ps_list_next_d(lwt_head);
+	temp = lwt_head;
+	lwt_head = ps_list_next_d(lwt_head);
 	while(lwt_head->status != LWT_ACTIVE)
 	{
 		lwt_head = ps_list_next_d(lwt_head);
@@ -312,7 +231,6 @@ __lwt_schedule(void)
 
 	if (temp != lwt_head)
 	{
-		lwt_curr = lwt_head;
 		__lwt_dispatch(temp, lwt_head);
 
 	}
@@ -345,16 +263,19 @@ __lwt_dispatch(lwt_t curr, lwt_t next)
 lwt_chan_t 
 lwt_chan(int sz)
 {
-	lwt_chan_t new = (lwt_chan_t)__channel_get();
+	lwt_chan_t new;
 	assert(sz >= 0);
-	new->data_buffer.size = sz;
+	uint size = sizeof(struct lwt_channel) + (sz + 1) * sizeof(void *);
+	new = (lwt_chan_t) kalloc(size);
+	assert(new);
+	new->data_buffer.size = sz + 1;
 	new->data_buffer.start = 0;
 	new->data_buffer.end = 0;
-	new->data_buffer.num = 0;
+	new->data_buffer.data = (void*)new+sizeof(struct lwt_channel);//kalloc(new->data_buffer.size * sizeof(void *));
 	new->snd_cnt = 0;
 	new->snd_thds = NULL;
-	new->id = gcounter.nchan_id++;
-	gcounter.nchan_counter++;
+	new->id = gcounter->nchan_id++;
+	gcounter->nchan_counter++;
 	new->rcv_thd = lwt_head;
 	new->iscgrp = 0;
 	new->cgrp = NULL;
@@ -369,15 +290,18 @@ lwt_chan(int sz)
 void 
 lwt_chan_deref(lwt_chan_t c)
 {
+	assert(c);
 	if(c->snd_cnt > 0)
 	{
 		c->snd_cnt--;
 	}
-	else if (c->rcv_thd == lwt_curr && c->rcv_thd->status == LWT_ACTIVE) 
+	else if (c->rcv_thd == lwt_head && c->rcv_thd->status == LWT_ACTIVE) 
 	{
-		gcounter.nchan_counter--;
+		gcounter->nchan_counter--;
 		c->rcv_thd = NULL; 	//will also set "rcv_thd" as NULL
-		__channel_return(c);
+		int size = sizeof(struct lwt_channel) + c->data_buffer.size * sizeof(void*);
+//		kfree((void*)c->data_buffer.data,c->data_buffer.size * sizeof(void*));
+		kfree((void*)c,size);//sizeof(struct lwt_channel));
 	}
 }
 
@@ -386,15 +310,15 @@ lwt_snd(lwt_chan_t c, void *data)
 {
 	//data being NULL or rcv being null is illegal
 	assert(data && c);
-
+/*
 	if (c->rcv_thd == NULL)
    	{
 		return -1;
-	}
+	}*/
 
-	gcounter.nsnding_counter++;
-	gcounter.runable_counter--;
-	if(c->data_buffer.size == 0)
+	gcounter->nsnding_counter++;
+	gcounter->runable_counter--;
+	if(c->data_buffer.size == 1)
 	{
 
 		//block current thread
@@ -403,10 +327,13 @@ lwt_snd(lwt_chan_t c, void *data)
 			lwt_yield(LWT_NULL);								
 		}
 		//if there is node that is new added without filling the data,fill it 
-		clist_t new_clist = (clist_t)__clist_get();
+		clist_t new_clist;
+		uint size = sizeof(struct clist_head);
+		new_clist = (clist_t) kalloc(size);
+		assert(new_clist);	
 		new_clist->thd = lwt_head;
 		new_clist->data = data;					
-//		ps_list_head_add_d(&c->snd_head, new_clist);
+
 		if(c->snd_thds == NULL)
 		{
 			ps_list_init_d(new_clist);
@@ -416,21 +343,19 @@ lwt_snd(lwt_chan_t c, void *data)
 		{
 			ps_list_add_d(ps_list_prev_d(c->snd_thds),new_clist);															
 		}
-		c->data_buffer.num++;
 	}
 	else
 	{
-		while(c->data_buffer.num == c->data_buffer.size) 
+		while((c->data_buffer.end + 1)%c->data_buffer.size == c->data_buffer.start) 
 		{
 			lwt_yield(LWT_NULL);							
 		}	
 		c->data_buffer.data[c->data_buffer.end] = data;
 		c->data_buffer.end = (c->data_buffer.end + 1)%c->data_buffer.size;
-		c->data_buffer.num++;
 
 	}
 	//add the event
-	if (c->iscgrp && 1 == c->data_buffer.num) 
+	if (c->iscgrp && (c->data_buffer.start + 1)%c->data_buffer.size == c->data_buffer.end)
 	{
 		if(c->cgrp->events == NULL)
 		{
@@ -444,8 +369,8 @@ lwt_snd(lwt_chan_t c, void *data)
 	}
 
 	c->rcv_thd->status = LWT_ACTIVE;
-	gcounter.nsnding_counter--;
-	gcounter.runable_counter++;
+	gcounter->nsnding_counter--;
+	gcounter->runable_counter++;
 	return 0;
 }
 
@@ -454,26 +379,26 @@ void
 {
 	assert(c != NULL);
 	void* temp;
-	if (c->rcv_thd != lwt_head) 
+/*	if (c->rcv_thd != lwt_head) 
 	{
 		return NULL;
-	}
+	}*/
 
 	c->rcv_thd->status = LWT_WAITING;//blocked = 1;
-	gcounter.nrcving_counter++;
-	gcounter.runable_counter--;
-	if(c->data_buffer.size == 0)
+	gcounter->nrcving_counter++;
+	gcounter->runable_counter--;
+	if(c->data_buffer.size == 1)
 	{
 		//if snd_thds is null, block the reciever to wait for sender
 		while (c->snd_thds == NULL)//ps_list_head_empty(&c->snd_head)) 
 		{
 			lwt_yield(LWT_NULL);						
 		}
-
 		temp = c->snd_thds->data;
 		if(ps_list_singleton_d(c->snd_thds))
 		{
-			__clist_return(c->snd_thds);
+			assert(c->snd_thds);
+			kfree((void *)c->snd_thds,sizeof(struct clist_head));
 			c->snd_thds = NULL;														
 		}
 		else
@@ -481,24 +406,21 @@ void
 			clist_t tmp = c->snd_thds;
 			c->snd_thds = ps_list_next_d(tmp);
 			ps_list_rem_d(tmp);
-			__clist_return(tmp);																								
+			assert(c->snd_thds);
+			kfree((void *)c->snd_thds,sizeof(struct clist_head));
 		}
-		c->data_buffer.num--;
 	}
 	else
 	{
 		//if empty, block rcv, remove c from ready queue
-		while(c->data_buffer.num == 0) 
+		while(c->data_buffer.start == c->data_buffer.end) 
 		{
 			lwt_yield(LWT_NULL);
 		}
 		temp = c->data_buffer.data[c->data_buffer.start];
 		c->data_buffer.start = (c->data_buffer.start + 1)%c->data_buffer.size;
-		c->data_buffer.num--;
-
-
 	}
-	if (c->iscgrp && 0 == c->data_buffer.num) 
+	if (c->iscgrp && c->data_buffer.start == c->data_buffer.end)
 	{
 		if(c->cgrp->events != NULL) 
 		{
@@ -513,8 +435,8 @@ void
 			}
 		}			
 	} 
-	gcounter.nrcving_counter--;
-	gcounter.runable_counter++;
+	gcounter->nrcving_counter--;
+	gcounter->runable_counter++;
 	c->rcv_thd->status = LWT_ACTIVE;
 	//remove the event
 	return temp;
@@ -553,146 +475,37 @@ lwt_rcv_chan(lwt_chan_t c)
  */
 
 lwt_t 
-lwt_create_chan(lwt_chan_fn_t fn, lwt_chan_t c)
+lwt_create_chan(lwt_chan_fn_t fn, lwt_chan_t c, lwt_flags_t flag)
 {
 	assert(fn);	
 	assert(c);
 	
-	lwt_t lwt = lwt_create((lwt_fn_t)fn,(void*)c,0);
+	lwt_t lwt = lwt_create((lwt_fn_t)fn,(void*)c,flag);
 	
 	c->snd_cnt++;
 
 	return lwt;
 }
 
-void 
-*__channel_get()
-{
-	lwt_chan_t c;
-	if(gcounter.avail_chan_counter == 0)
-	{
-		uint size = sizeof(struct lwt_channel);
-		if(rest_pool >= size)
-		{	
-			c = __get_space_from_pool(size);
-			rest_pool -= size;
-		}
-		else
-		{
-			c = malloc(size);
-			if(c == NULL)
-				assert(c);
-		}
-	}
-	else
-	{
-		//c = ps_list_head_last(&pool_chan_head, struct lwt_channel, list);		
-		c = (lwt_chan_t)((char *)pool_chan_head.l.p - sizeof(struct lwt_channel) + sizeof(struct ps_list));
-		ps_list_rem_d(c);
-		gcounter.avail_chan_counter--;
-	}	
-	return c;
-}
-
-void 
-__channel_return(void *chan)
-{
-	assert(chan);
-	ps_list_head_add_d(&pool_chan_head, (lwt_chan_t)chan);
-	gcounter.avail_chan_counter++;
-}
-
-void 
-*__clist_get()
-{
-	clist_t c;	
-	if(gcounter.avail_clist_counter == 0)
-	{
-		uint size = sizeof(struct clist_head);
-		if(rest_pool >= size)
-		{	
-			c = __get_space_from_pool(size);
-			rest_pool -= size;
-		}
-		else
-		{
-			c = malloc(size);															
-			if(c == NULL)
-				assert(0);
-		}
-	}
-	else
-	{
-		//c = ps_list_head_last(&pool_clist_head, struct clist_head, list);		
-		c = (clist_t)((char *)pool_clist_head.l.p - sizeof(struct clist_head) + sizeof(struct ps_list));
-		ps_list_rem_d(c);
-		gcounter.avail_clist_counter--;
-	}	
-	return c;
-}
-
-void 
-__clist_return(void *clist)
-{
-	assert(clist);
-	ps_list_head_add_d(&pool_clist_head, (clist_t)clist);
-	gcounter.avail_clist_counter++;
-}
-
-void 
-*__cgrp_get()
-{
-	lwt_cgrp_t c;	
-	if(gcounter.avail_cgrp_counter == 0)
-	{
-		uint size = sizeof(struct cgroup);
-		if(rest_pool >= size)
-		{	
-			c = __get_space_from_pool(size);
-			rest_pool -= size;
-		}
-		else
-		{
-			c = malloc(size);															
-			if(c == NULL)
-				assert(0);
-		}
-	}
-	else
-	{
-		//c = ps_list_head_last(&pool_cgrp_head, struct cgroup, list);		
-		c = (lwt_cgrp_t)((char *)pool_cgrp_head.l.p - sizeof(struct cgroup) + sizeof(struct ps_list));
-		ps_list_rem_d(c);
-		gcounter.avail_cgrp_counter--;
-	}	
-	return c;
-}
-
-void 
-__cgrp_return(void *cgrp)
-{
-	assert(cgrp);
-	ps_list_head_add_d(&pool_cgrp_head, (lwt_cgrp_t)cgrp);
-	gcounter.avail_cgrp_counter++;
-}
-
 lwt_cgrp_t 
 lwt_cgrp(void)
 {
 	lwt_cgrp_t new;
-	new = __cgrp_get();
+    uint size = sizeof(struct cgroup);
+	new = (lwt_cgrp_t) kalloc(size);
+	assert(new);
 	new->n_chan = 0;
 	new->events = NULL;
 	return new;
-
 }
 
 int 
 lwt_cgrp_free(lwt_cgrp_t cgrp)
 {
+	assert(cgrp);
 	if (NULL == cgrp->events && 0 == cgrp->n_chan)
 	{
-		__cgrp_return(cgrp);
+		kfree((void *)cgrp,sizeof(struct cgroup));
 		return 0;							    
 	}
     return -1;
@@ -705,12 +518,13 @@ int lwt_cgrp_add(lwt_cgrp_t cgrp, lwt_chan_t c)
 	cgrp->n_chan++;
 	c->iscgrp = 1;
 	c->cgrp = cgrp;		 
-
+	return 0;
 }
 
 int lwt_cgrp_rem(lwt_cgrp_t cgrp, lwt_chan_t c)
 {
-	if (c->data_buffer.num != 0) 
+	assert(!c->snd_thds);
+	if (c->snd_thds != NULL || c->data_buffer.start != c->data_buffer.end) 
 		return 1; //cgrp has a pending event
 	if(cgrp != c->cgrp)
 		return -1;	
@@ -722,12 +536,12 @@ int lwt_cgrp_rem(lwt_cgrp_t cgrp, lwt_chan_t c)
 
 lwt_chan_t lwt_cgrp_wait(lwt_cgrp_t cgrp)
 {
-	lwt_curr->status = LWT_WAITING;
+	lwt_head->status = LWT_WAITING;
 	while (cgrp->events == NULL) 
 	{
 		lwt_yield(NULL);			    
 	}
-	lwt_curr->status = LWT_ACTIVE;
+	lwt_head->status = LWT_ACTIVE;
 	return cgrp->events;
 
 }
@@ -744,3 +558,30 @@ void *lwt_chan_mark_get(lwt_chan_t c)
 	return c->mark;
 
 }
+
+lwt_t __lwt_init(lwt_fn_t fn)
+{
+	return NULL;
+}
+/*
+void *__lwt_kthd_entry(void* data)
+{
+	kthd_parm_t parm = (kthd_parm_t) data;
+	__init_thread_head();
+	parm->lwt = lwt_create_chan((lwt_chan_fn_t)parm->fn,parm->c, LWT_NOJOIN);
+
+	while(1)
+	{
+		lwt_yield(NULL);
+		sl_thd_yield(0);
+	}
+}
+
+int lwt_kthd_create(lwt_fn_t fn, lwt_chan_t c)
+{
+	kthd_parm_t parm = (kthd_parm_t)kalloc(sizeof(struct __kthd_parm_t));
+	assert(parm);
+	parm->fn = fn;
+	parm->c = c;
+	return (sl_thd_alloc(fn,c) == NULL) - 1;	
+}*/
