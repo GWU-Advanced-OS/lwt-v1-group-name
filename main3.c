@@ -387,18 +387,20 @@ void* pr()
 	printf("\n");
 }
 
+
 int
 main(void)
 {
 	lwt_init();
 	test_perf();
 	test_perf_channels(0);
-	test_perf_async_steam(ITER/10 < 100 ? ITER/10 : 100);
+/*	test_perf_async_steam(ITER/10 < 100 ? ITER/10 : 100);
 	test_crt_join_sched();
 	test_multisend(0);
 	test_multisend(ITER/10 < 100 ? ITER/10 : 100);
 	test_grpwait(0, 3);
-	test_grpwait(3, 3);
+	test_grpwait(3, 3);*/
+	run_lm_tests();
 
 //	lwt_kthd_create(pr,(void*)1);
 

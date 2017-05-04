@@ -4,6 +4,9 @@
 #include<sl.h>
 #include"include/kalloc.h"
 #include"include/lwt.h"
+#define LWT_CAS(d,t,v) do{		\
+	t = d;						\
+}while(!ps_cas(&d,t,t+v))
 
 void __lwt_start();
 void __lwt_schedule(void);
@@ -32,11 +35,14 @@ __init_thread_head()
 	ps_list_init_d(lwt_head);
 	lwt_head->ip = (ulong)0;
 	lwt_head->sp = (ulong)0;
-	lwt_head->id = gcounter.lwt_count++;
+	lwt_head->id = gcounter.lwt_count;
 	lwt_head->status = LWT_ACTIVE;
 	lwt_head->tid = cos_thdid();
-	gcounter.runable_counter++;
-
+	
+	int t;
+	LWT_CAS(gcounter.lwt_count,t,1);
+	
+	LWT_CAS(gcounter.runable_counter,t,1);
 }
 
 lwt_t 
@@ -51,7 +57,7 @@ lwt_create(lwt_fn_t fn, void *data, lwt_flags_t flags)
 	uint size = sizeof(struct _lwt_t) + STACK_SIZE;
 	lwt_new = (lwt_t) kalloc(size);
 	assert(lwt_new);
-	lwt_new->id = gcounter.lwt_count++;
+	lwt_new->id = gcounter.lwt_count;
 	lwt_new->ip = (ulong) (&__lwt_start);
 	lwt_new->sp = (ulong)lwt_new + size - 4; 		
 	lwt_new->status = LWT_ACTIVE;
@@ -64,8 +70,10 @@ lwt_create(lwt_fn_t fn, void *data, lwt_flags_t flags)
 	lwt_new->target = NULL;
 	lwt_new->return_val = NULL;
 
-	gcounter.runable_counter++;
-
+	int t;
+	LWT_CAS(gcounter.lwt_count,t,1);
+	
+	LWT_CAS(gcounter.runable_counter,t,1);
 	
 	ps_list_add_d(ps_list_prev_d(lwt_head),lwt_new);
 
@@ -76,6 +84,7 @@ void*
 lwt_join(lwt_t lwt)
 {	
 	void *temp_data;
+	int t;
 
 	assert(lwt);
 	if(lwt->lwt_nojoin)
@@ -85,8 +94,11 @@ lwt_join(lwt_t lwt)
 	if(lwt->status == LWT_ACTIVE)
 	{
 		lwt_head->status = LWT_BLOCKED;
-		gcounter.blocked_counter++;
-		gcounter.runable_counter--;
+
+		LWT_CAS(gcounter.blocked_counter,t,1);
+	
+		LWT_CAS(gcounter.runable_counter,t,-1);
+		
 		lwt_yield(NULL);
 		/*lwt_chan_t c = lwt_chan(0);
 		c->snd_cnt = 1;
@@ -97,7 +109,7 @@ lwt_join(lwt_t lwt)
 	temp_data = lwt->return_val;
 	ps_list_rem_d(lwt);
 	kfree((void *)lwt,sizeof(struct _lwt_t) + STACK_SIZE);
-	gcounter.died_counter--;
+	LWT_CAS(gcounter.died_counter,t,-1);
 
 	return temp_data;
 
@@ -106,23 +118,9 @@ lwt_join(lwt_t lwt)
 void
 lwt_die(void *data)
 {	
-
-	/*
-	 * if the current thread is the joiner of a specific thread,
-	 * set this blocked thread active
-	 */
-
-	if(lwt_head->target != LWT_NULL)// && lwt_head->target->status == LWT_BLOCKED)
-	{
-		gcounter.blocked_counter--;
-		lwt_head->target->status = LWT_ACTIVE;
-		gcounter.runable_counter++;
-		/*lwt_snd((lwt_chan_t)lwt_head->target->data,(void *)1);
-		lwt_chan_deref((lwt_chan_t)lwt_head->target->data);*/
-	}
-		
+	int t;
 	lwt_head->return_val = (void *)data;
-	gcounter.runable_counter--;
+	LWT_CAS(gcounter.runable_counter,t,-1);
 
 	if(lwt_head->lwt_nojoin)
 	{
@@ -137,12 +135,29 @@ lwt_die(void *data)
 		struct _lwt_t trash;
 		__lwt_dispatch(&trash,lwt_head);
 	}
-	else
-	{
-		lwt_head->status = LWT_DEAD;
-		gcounter.died_counter++;
-		__lwt_schedule();	
+	
+
+	/*
+	 * if the current thread is the joiner of a specific thread,
+	 * set this blocked thread active
+	 */
+
+	if(lwt_head->target != LWT_NULL)// && lwt_head->target->status == LWT_BLOCKED)
+	{		
+		LWT_CAS(gcounter.blocked_counter,t,-1);
+		LWT_CAS(gcounter.runable_counter,t,1);
+		
+		lwt_head->target->status = LWT_ACTIVE;
+		/*lwt_snd((lwt_chan_t)lwt_head->target->data,(void *)1);
+		lwt_chan_deref((lwt_chan_t)lwt_head->target->data);*/
 	}
+
+	LWT_CAS(gcounter.died_counter,t,1);
+	
+	lwt_head->status = LWT_DEAD;
+
+	__lwt_schedule();	
+		
 }
 
 int
@@ -160,7 +175,7 @@ lwt_yield(lwt_t lwt)
 			lwt_t tmp_curr = lwt_head;
 			lwt_head = lwt;
 			__lwt_dispatch(tmp_curr,lwt_head);
-		}_
+		}
 		else
 		{
 			__lwt_schedule();
@@ -281,11 +296,17 @@ lwt_chan(int sz)
 	new->data_buffer.data = (void*) new + sizeof(struct lwt_channel);
 	new->snd_cnt = 0;
 	new->snd_thds = NULL;
-	new->id = gcounter.nchan_id++;
-	gcounter.nchan_counter++;
+	new->id = gcounter.nchan_id;
+
 	new->rcv_thd = lwt_head;
 	new->iscgrp = 0;
 	new->cgrp = NULL;
+	
+	int t;
+	LWT_CAS(gcounter.nchan_id,t,1);
+
+	LWT_CAS(gcounter.nchan_counter,t,1);
+	
 	return new;
 }
 
@@ -304,7 +325,11 @@ lwt_chan_deref(lwt_chan_t c)
 	}
 	else if (c->rcv_thd == lwt_head && c->rcv_thd->status == LWT_ACTIVE) 
 	{
-		gcounter.nchan_counter--;
+
+		int t;
+			
+		LWT_CAS(gcounter.nchan_counter,t,-1);
+	
 		c->rcv_thd = NULL; 	//will also set "rcv_thd" as NULL
 		kfree((void*)c,sizeof(struct lwt_channel) + c->data_buffer.size * sizeof(void *));
 	}
@@ -321,8 +346,12 @@ lwt_snd(lwt_chan_t c, void *data)
 		return -1;
 	}*/
 
-	gcounter.nsnding_counter++;
-	gcounter.runable_counter--;
+	int t;
+			
+	LWT_CAS(gcounter.nsnding_counter,t,1);
+	
+	LWT_CAS(gcounter.runable_counter,t,-1);
+
 	if(c->data_buffer.size == 1)
 	{
 
@@ -351,13 +380,16 @@ lwt_snd(lwt_chan_t c, void *data)
 	}
 	else
 	{
-		while((c->data_buffer.end + 1)%c->data_buffer.size == c->data_buffer.start) 
-		{
-			lwt_yield(LWT_NULL);							
-		}	
-		c->data_buffer.data[c->data_buffer.end] = data;
-		c->data_buffer.end = (c->data_buffer.end + 1)%c->data_buffer.size;
 
+		int tail;
+		do{
+			while((c->data_buffer.end + 1)%c->data_buffer.size == c->data_buffer.start) 
+			{
+				lwt_yield(LWT_NULL);							
+			}
+			tail = c->data_buffer.end;
+			c->data_buffer.data[tail] = data;	
+		}while(!ps_cas(&(c->data_buffer.end), tail,(tail + 1)%c->data_buffer.size));
 	}
 	//add the event
 	if (c->iscgrp && (c->data_buffer.start + 1)%c->data_buffer.size == c->data_buffer.end)
@@ -374,16 +406,18 @@ lwt_snd(lwt_chan_t c, void *data)
 	}
 
 	c->rcv_thd->status = LWT_ACTIVE;
-	struct sl_thd* t = sl_thd_lkup(c->rcv_thd->tid);
+	struct sl_thd* sl = sl_thd_lkup(c->rcv_thd->tid);
 
-	if(t->state == SL_THD_BLOCKED)
+	if(sl->state == SL_THD_BLOCKED)
 	{
-		t->state = SL_THD_RUNNABLE;
-		sl_mod_wakeup(sl_mod_thd_policy_get(t));
+		sl->state = SL_THD_RUNNABLE;
+		sl_mod_wakeup(sl_mod_thd_policy_get(sl));
 	}
 
-	gcounter.nsnding_counter--;
-	gcounter.runable_counter++;
+	LWT_CAS(gcounter.nsnding_counter,t,-1);
+	
+	LWT_CAS(gcounter.runable_counter,t,1);
+	
 	return 0;
 }
 
@@ -398,9 +432,14 @@ void
 		return NULL;
 	}*/
 
+	int t;
+	
+	LWT_CAS(gcounter.nrcving_counter,t,1);
+	
+	LWT_CAS(gcounter.runable_counter,t,-1);
+	
 	c->rcv_thd->status = LWT_WAITING;//blocked = 1;
-	gcounter.nrcving_counter++;
-	gcounter.runable_counter--;
+
 	if(c->data_buffer.size == 1)
 	{
 		//if snd_thds is null, block the reciever to wait for sender
@@ -426,13 +465,17 @@ void
 	}
 	else
 	{
-		//if empty, block rcv, remove c from ready queue
-		while(c->data_buffer.start == c->data_buffer.end) 
-		{
-			lwt_yield(LWT_NULL);
-		}
-		temp = c->data_buffer.data[c->data_buffer.start];
-		c->data_buffer.start = (c->data_buffer.start + 1)%c->data_buffer.size;
+		int head;
+		do{
+			//if empty, block rcv, remove c from ready queue
+			while(c->data_buffer.start == c->data_buffer.end) 
+			{
+				lwt_yield(LWT_NULL);
+			}
+			head = c->data_buffer.start;
+			temp = c->data_buffer.data[head];
+		}while(!ps_cas(&c->data_buffer.start,head,(head + 1)%c->data_buffer.size));
+
 	}
 	if (c->iscgrp && c->data_buffer.start == c->data_buffer.end)
 	{
@@ -449,8 +492,11 @@ void
 			}
 		}			
 	} 
-	gcounter.nrcving_counter--;
-	gcounter.runable_counter++;
+	
+	LWT_CAS(gcounter.nrcving_counter,t,-1);
+	
+	LWT_CAS(gcounter.runable_counter,t,1);
+
 	c->rcv_thd->status = LWT_ACTIVE;
 	//remove the event
 	return temp;
@@ -578,7 +624,6 @@ void *__lwt_kthd_entry(void* data)
 	__init_thread_head();
 	kthd_parm_t parm = (kthd_parm_t) data;
 	parm->lwt = lwt_head;
-	//global_counter_t* tmpcounter = gcounter;
 	lwt_create(parm->fn,parm->c, LWT_NOJOIN);
 
 	int id = cos_thdid();
@@ -587,7 +632,6 @@ void *__lwt_kthd_entry(void* data)
 		sl_cs_enter();
 
 		lwt_head = parm->lwt;
-	//	gcounter = tmpcounter;
 		lwt_yield(NULL);
 		
 		sl_cs_exit();
@@ -599,15 +643,11 @@ void *__lwt_kthd_entry(void* data)
 				anum++;
 			tmp = ps_list_next_d(tmp);
 		}while(tmp != parm->lwt);
-	//	int ifnext = ps_list_next_d(parm->lwt) != parm->lwt;
-	//	if(!ifnext)
+
 		if(anum == 1)
-//		assert(gcounter.runable);
-//		if(gcounter.runable == 1)
 		{
 			sl_thd_block(0);
 		}
-		//sl_cs_exit_schedule_nospin();
 
 		sl_thd_yield(0);
 	}
@@ -629,8 +669,11 @@ int lwt_snd_thd(lwt_chan_t c, lwt_t sending)
 {
 	assert(sending != lwt_head);
 	sending->status = LWT_BLOCKED;
-	gcounter.runable_counter--;
-	gcounter.blocked_counter++;
+	
+
+	int t;
+	LWT_CAS(gcounter.runable_counter,t,-1);
+
 	return lwt_snd(c,sending);
 }
 
@@ -641,8 +684,10 @@ lwt_t lwt_rcv_thd(lwt_chan_t c)
 	ps_list_rem_d(lwt);
 	ps_list_add_d(ps_list_prev_d(lwt_head),lwt);
 	lwt->status = LWT_ACTIVE;
-	gcounter.blocked_counter--;
-	gcounter.runable_counter++;
+	
+	int t;
+	LWT_CAS(gcounter.runable_counter,t,1);
+	
 	return lwt;
 }
 

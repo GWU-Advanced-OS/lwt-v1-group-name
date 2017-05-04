@@ -137,7 +137,6 @@ fn_cpy(void)
 
 void test_remote_yield()
 {
-	kinit();
 	lwt_chan_t c1 = lwt_chan(0);
 	lwt_chan_t c2 = lwt_chan(0);
 //	lwt_chan_t c3 = lwt_chan(0);
@@ -155,13 +154,11 @@ fn2(lwt_chan_t to)
 	from = lwt_chan(0);
 	lwt_snd_chan(to, from);
 	assert(from->snd_cnt);
-	for (i = 0 ; i < 100 ; i++) {
+	for (i = 0 ; i < 10000 ; i++) {
 		lwt_snd(to, (void*)1);
 		assert(2 == (int)lwt_rcv(from));
 	}
 	lwt_chan_deref(from);
-	printc("successful\n");
-	printc("curr lwt %d curr kthd %d\n",lwt_head->id,lwt_head->tid);
 }
 
 void
@@ -174,22 +171,20 @@ fn1(lwt_chan_t from)
 	to   = lwt_rcv_chan(from);
 	assert(to->snd_cnt);
 	rdtscll(start);
-	for (i = 0 ; i < 100 ; i++) {
+	for (i = 0 ; i < 10000 ; i++) {
 		assert(1 == (int)lwt_rcv(from));
 		lwt_snd(to, (void*)2);
 	}
 	lwt_chan_deref(to);
 	rdtscll(end);
 	printc("[PERF] %5lld <- snd+rcv (buffer size %d)\n", 
-	       (end-start)/(100*2), 0);
+	       (end-start)/(10000*2), from->data_buffer.size - 1);
 	lwt_join(to->rcv_thd);
-	printc("curr lwt %d curr kthd %d\n",lwt_head->id,lwt_head->tid);
 }
 
 void 
 test_remote_communication(int sz)
 {
-	kinit();
 	lwt_chan_t c1 = lwt_chan(sz);	
 	assert(lwt_kthd_create(fn1,c1) == 0);
 	assert(lwt_kthd_create(fn2,c1) == 0);
@@ -228,7 +223,6 @@ fn_snd_thd(lwt_chan_t to)
 void 
 test_thd_snd()
 {
-	kinit();
 	lwt_chan_t c1 = lwt_chan(0);	
 	assert(lwt_kthd_create(fn_rcv_thd,c1) == 0);
 	assert(lwt_kthd_create(fn_snd_thd,c1) == 0);
@@ -264,10 +258,143 @@ fn_arcv(lwt_chan_t from)
 void 
 test_remote_asy(int chsz)
 {
-	kinit();
 	lwt_chan_t c = lwt_chan(chsz);
 	assert(lwt_kthd_create(fn_arcv,c) == 0);
 	assert(lwt_kthd_create(fn_asnd,c) == 0);
+}
+
+void*
+fn_grp_snd(void *d)
+{
+	assert(d);
+	int i;
+
+	for (i = 0 ; i < 10000 ; i++) 
+	{
+		if ((i % 7) == 0) 
+		{
+			int j;
+			for (j = 0 ; j < (i % 8) ; j++) 
+				lwt_yield(LWT_NULL);
+		}
+		lwt_snd((lwt_chan_t)d, ((lwt_chan_t)d)->id);
+	}
+
+}
+
+void*
+fn_multisend(lwt_chan_t c)
+{
+	int i;
+	lwt_chan_t ct;
+
+	for(i = 0; i < 30; i++)
+	{
+		ct = lwt_rcv_chan(c);
+		lwt_create_chan((lwt_chan_fn_t)fn_grp_snd,ct,LWT_NOJOIN);
+	}
+
+	lwt_yield(LWT_NULL);
+
+	return NULL;
+}
+
+void*
+fn_multiwait(lwt_chan_t c)
+{
+	int i;
+			
+	lwt_chan_t *cs = (lwt_chan_t*)kalloc(sizeof(lwt_chan_t)*30);
+				
+	lwt_cgrp_t g;
+	unsigned long long start, end;
+	g = lwt_cgrp();
+	assert(g);
+
+	for(i = 0; i < 30; i++)
+	{
+		cs[i] = lwt_chan(0);
+		lwt_chan_mark_set(cs[i], (cs[i])->id);
+		lwt_snd_chan(c,cs[i]);
+		assert(0 == lwt_cgrp_add(g, cs[i]));
+	}
+
+	assert(lwt_cgrp_free(g) == -1);
+
+	rdtscll(start);
+	for(i = 0 ; i < 10000 * 30; i++) 
+	{
+		lwt_chan_t c;
+		int r;
+		c = lwt_cgrp_wait(g);
+		assert(c);
+		r = (int)lwt_rcv(c);
+		assert(r == (int)lwt_chan_mark_get(c));
+	}
+	rdtscll(end);
+	printc("[PERF] %5lld <- multiwait (group size %d)\n", (end-start)/(10000*30), 100);
+
+	for(i = 0 ; i < 30; i++) 
+	{
+		lwt_cgrp_rem(g, cs[i]);
+		lwt_chan_deref(cs[i]);
+	}
+	assert(0 == lwt_cgrp_free(g));
+	return NULL;
+
+}
+
+void
+test_kthd_multiwait()
+{
+	lwt_chan_t c = lwt_chan(0);
+			
+	assert(0 == lwt_kthd_create((lwt_fn_t)fn_multisend, c));
+	assert(0 == lwt_kthd_create((lwt_fn_t)fn_multiwait, c));
+
+}
+
+void* 
+fn_record(void)
+{
+	unsigned long long start, end;
+	rdtscll(start);
+	lwt_yield(NULL);
+	rdtscll(end);
+	printc("[PERF] %5lld <- thd_yield in lwt\n", (end-start)/11);
+}
+
+void* 
+fn_nulll(void)
+{lwt_yield(NULL);}
+
+void
+test_kthd_create(void)
+{
+	int i;
+	unsigned long long start, end;
+
+	lwt_chan_t c = lwt_chan(0);
+	rdtscll(start);
+	for (i = 0 ; i < 10 ; i++){
+		lwt_kthd_create(fn_nulll, c, LWT_NOJOIN);
+	}
+	rdtscll(end);
+
+
+	printc("[PERF] %5lld <- thd_create in lwt\n", (end-start)/10);
+}
+
+void
+test_kthd_yield(void)
+{
+	int i;
+	
+	lwt_chan_t c = lwt_chan(0);
+	lwt_kthd_create(fn_record, c, LWT_NOJOIN);
+	for (i = 0 ; i < 10 ; i++){
+		lwt_kthd_create(fn_nulll, c, LWT_NOJOIN);
+	}
 }
 
 void
@@ -281,14 +408,23 @@ cos_init(void)
 	cos_defcompinfo_init();
 	sl_init();
 
+	kinit();
 //	test_yields();
 //	test_blocking_directed_yield();
-	maintest();
+//	maintest();
 
 //	test_remote_yield();
+
 //	test_remote_communication(0);
+//	test_remote_communication(1);
+//	test_remote_communication(4);
+//	test_remote_communication(16);
+//	test_remote_communication(64);
 //	test_thd_snd();
 //	test_remote_asy(10);
+	test_kthd_multiwait();
+//	test_kthd_yield();
+//	test_kthd_create();
 	sl_sched_loop();
 	printc("testfinished\n");
 

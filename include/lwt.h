@@ -137,7 +137,7 @@ typedef void *(*lwt_chan_fn_t)(lwt_chan_t);
 lwt_t lwt_head;
 
 
-global_counter_t* gcounter;
+global_counter_t gcounter;
 
 lwt_t lwt_create(lwt_fn_t fn, void *data, lwt_flags_t flags);
 void *lwt_join(lwt_t thread);

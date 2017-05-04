@@ -4,218 +4,568 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ADDITIONAL_LIBS	scheddev/Makefile	/^ADDITIONAL_LIBS=-lcos_defkernel_api -lcos_kernel_api$/;"	m
+BUG	scheddev/sl_thd.h	31;"	d
+BUG	scheddev/unit_schedlib.c	19;"	d	file:
+COMPONENT	scheddev/Makefile	/^COMPONENT=unit_sl.o$/;"	m
 DEBUG	include/lwt.h	7;"	d
+DEBUG	scheddev/include/lwt.h	6;"	d
+DEPENDENCIES	scheddev/Makefile	/^DEPENDENCIES=$/;"	m
 GRPSZ	main3.c	331;"	d	file:
+GRPSZ	scheddev/main3.c	332;"	d	file:
+IF_LIB	scheddev/Makefile	/^IF_LIB=$/;"	m
+INTERFACES	scheddev/Makefile	/^INTERFACES=$/;"	m
 IS_RESET	main1.c	73;"	d	file:
 IS_RESET	main3.c	48;"	d	file:
+IS_RESET	scheddev/main3.c	50;"	d	file:
 ITER	main1.c	9;"	d	file:
 ITER	main3.c	9;"	d	file:
+ITER	scheddev/main3.c	11;"	d	file:
 KALLOC_H	include/kalloc.h	2;"	d
-LWT_ACTIVE	include/lwt.h	/^	LWT_ACTIVE,$/;"	e	enum:__anon2
-LWT_BLOCKED	include/lwt.h	/^	LWT_BLOCKED,$/;"	e	enum:__anon2
-LWT_DEAD	include/lwt.h	/^	LWT_DEAD,$/;"	e	enum:__anon2
-LWT_INFO_NCHAN	include/lwt.h	/^	LWT_INFO_NCHAN,$/;"	e	enum:__anon1
-LWT_INFO_NRCVING	include/lwt.h	/^	LWT_INFO_NRCVING,$/;"	e	enum:__anon1
-LWT_INFO_NSNDING	include/lwt.h	/^	LWT_INFO_NSNDING,$/;"	e	enum:__anon1
-LWT_INFO_NTHD_BLOCKED	include/lwt.h	/^	LWT_INFO_NTHD_BLOCKED,$/;"	e	enum:__anon1
-LWT_INFO_NTHD_RUNNABLE	include/lwt.h	/^	LWT_INFO_NTHD_RUNNABLE,$/;"	e	enum:__anon1
-LWT_INFO_NTHD_ZOMBIES	include/lwt.h	/^	LWT_INFO_NTHD_ZOMBIES,$/;"	e	enum:__anon1
-LWT_JOIN	include/lwt.h	/^	LWT_JOIN,$/;"	e	enum:__anon3
-LWT_NOJOIN	include/lwt.h	/^	LWT_NOJOIN,$/;"	e	enum:__anon3
+KALLOC_H	scheddev/include/kalloc.h	2;"	d
+LWT_ACTIVE	include/lwt.h	/^	LWT_ACTIVE,$/;"	e	enum:__anon7
+LWT_ACTIVE	scheddev/include/lwt.h	/^	LWT_ACTIVE,$/;"	e	enum:__anon3
+LWT_BLOCKED	include/lwt.h	/^	LWT_BLOCKED,$/;"	e	enum:__anon7
+LWT_BLOCKED	scheddev/include/lwt.h	/^	LWT_BLOCKED,$/;"	e	enum:__anon3
+LWT_DEAD	include/lwt.h	/^	LWT_DEAD,$/;"	e	enum:__anon7
+LWT_DEAD	scheddev/include/lwt.h	/^	LWT_DEAD,$/;"	e	enum:__anon3
+LWT_INFO_NCHAN	include/lwt.h	/^	LWT_INFO_NCHAN,$/;"	e	enum:__anon6
+LWT_INFO_NCHAN	scheddev/include/lwt.h	/^	LWT_INFO_NCHAN,$/;"	e	enum:__anon2
+LWT_INFO_NRCVING	include/lwt.h	/^	LWT_INFO_NRCVING,$/;"	e	enum:__anon6
+LWT_INFO_NRCVING	scheddev/include/lwt.h	/^	LWT_INFO_NRCVING,$/;"	e	enum:__anon2
+LWT_INFO_NSNDING	include/lwt.h	/^	LWT_INFO_NSNDING,$/;"	e	enum:__anon6
+LWT_INFO_NSNDING	scheddev/include/lwt.h	/^	LWT_INFO_NSNDING,$/;"	e	enum:__anon2
+LWT_INFO_NTHD_BLOCKED	include/lwt.h	/^	LWT_INFO_NTHD_BLOCKED,$/;"	e	enum:__anon6
+LWT_INFO_NTHD_BLOCKED	scheddev/include/lwt.h	/^	LWT_INFO_NTHD_BLOCKED,$/;"	e	enum:__anon2
+LWT_INFO_NTHD_RUNNABLE	include/lwt.h	/^	LWT_INFO_NTHD_RUNNABLE,$/;"	e	enum:__anon6
+LWT_INFO_NTHD_RUNNABLE	scheddev/include/lwt.h	/^	LWT_INFO_NTHD_RUNNABLE,$/;"	e	enum:__anon2
+LWT_INFO_NTHD_ZOMBIES	include/lwt.h	/^	LWT_INFO_NTHD_ZOMBIES,$/;"	e	enum:__anon6
+LWT_INFO_NTHD_ZOMBIES	scheddev/include/lwt.h	/^	LWT_INFO_NTHD_ZOMBIES,$/;"	e	enum:__anon2
+LWT_JOIN	include/lwt.h	/^	LWT_JOIN,$/;"	e	enum:__anon8
+LWT_JOIN	scheddev/include/lwt.h	/^	LWT_JOIN,$/;"	e	enum:__anon4
+LWT_NOJOIN	include/lwt.h	/^	LWT_NOJOIN,$/;"	e	enum:__anon8
+LWT_NOJOIN	scheddev/include/lwt.h	/^	LWT_NOJOIN,$/;"	e	enum:__anon4
 LWT_NULL	include/lwt.h	17;"	d
-LWT_WAITING	include/lwt.h	/^	LWT_WAITING,$/;"	e	enum:__anon2
+LWT_NULL	scheddev/include/lwt.h	15;"	d
+LWT_WAITING	include/lwt.h	/^	LWT_WAITING,$/;"	e	enum:__anon7
+LWT_WAITING	scheddev/include/lwt.h	/^	LWT_WAITING,$/;"	e	enum:__anon3
+MANDITORY_LIB	scheddev/Makefile	/^MANDITORY_LIB=simple_stklib.o$/;"	m
+N_TESTTHDS	scheddev/unit_schedlib.c	51;"	d	file:
+PAGENUM	scheddev/include/kalloc.h	12;"	d
 PAGESIZE	include/kalloc.h	11;"	d
+PAGESIZE	scheddev/include/kalloc.h	17;"	d
+PRINT_FN	scheddev/sl_thd.h	29;"	d
+PRINT_FN	scheddev/unit_schedlib.c	17;"	d	file:
 PS_LIST_DEF_NAME	include/ps_list.h	65;"	d
+PS_LIST_DEF_NAME	scheddev/include/ps_list.h	65;"	d
 PS_LIST_H	include/ps_list.h	50;"	d
+PS_LIST_H	scheddev/include/ps_list.h	50;"	d
 RING_SIZE	include/lwt.h	15;"	d
+RING_SIZE	scheddev/include/lwt.h	13;"	d
+SL_CONSTS	scheddev/sl_consts.h	2;"	d
+SL_FPRR_HIGHEST	scheddev/sl_mod_fprr.c	7;"	d	file:
+SL_FPRR_LOWEST	scheddev/sl_mod_fprr.c	8;"	d	file:
+SL_FPRR_NPRIOS	scheddev/sl_mod_fprr.c	6;"	d	file:
+SL_H	scheddev/sl.h	31;"	d
+SL_PERIOD_US	scheddev/sl_consts.h	4;"	d
+SL_PLUGINS_H	scheddev/sl_plugins.h	2;"	d
+SL_POLICY_H	scheddev/sl_mod_policy.h	2;"	d
+SL_POLICY_H	scheddev/sl_policy.h	2;"	d
+SL_THD_BLOCKED	scheddev/sl_thd.h	/^	SL_THD_BLOCKED,$/;"	e	enum:__anon5
+SL_THD_DYING	scheddev/sl_thd.h	/^	SL_THD_DYING,$/;"	e	enum:__anon5
+SL_THD_FREE	scheddev/sl_thd.h	/^	SL_THD_FREE = 0,$/;"	e	enum:__anon5
+SL_THD_H	scheddev/sl_thd.h	9;"	d
+SL_THD_RUNNABLE	scheddev/sl_thd.h	/^	SL_THD_RUNNABLE,$/;"	e	enum:__anon5
+SL_THD_WOKEN	scheddev/sl_thd.h	/^	SL_THD_WOKEN, 		\/* if a race causes a wakeup before the inevitable block *\/$/;"	e	enum:__anon5
+SPIN	scheddev/sl_thd.h	32;"	d
+SPIN	scheddev/unit_schedlib.c	20;"	d	file:
 STACK_SIZE	include/lwt.h	12;"	d
+STACK_SIZE	scheddev/include/lwt.h	10;"	d
+WORKITERS	scheddev/unit_schedlib.c	52;"	d	file:
 _LWT_H	include/lwt.h	3;"	d
+_LWT_H	scheddev/include/lwt.h	3;"	d
 __init_thread_head	lwt.c	/^__init_thread_head()$/;"	f
-__kthd_parm_t	include/lwt.h	/^typedef struct __kthd_parm_t$/;"	s
+__init_thread_head	scheddev/lwt.c	/^__init_thread_head()$/;"	f
+__kthd_parm_t	scheddev/include/lwt.h	/^typedef struct __kthd_parm_t$/;"	s
 __lwt_dispatch	lwt.c	/^__lwt_dispatch(lwt_t curr, lwt_t next)	$/;"	f	file:
+__lwt_dispatch	scheddev/lwt.c	/^__lwt_dispatch(lwt_t curr, lwt_t next)	$/;"	f	file:
 __lwt_init	lwt.c	/^lwt_t __lwt_init(lwt_fn_t fn)$/;"	f
-__lwt_kthd_entry	lwt.c	/^void *__lwt_kthd_entry(void* data)$/;"	f
+__lwt_kthd_entry	scheddev/lwt.c	/^void *__lwt_kthd_entry(void* data)$/;"	f
 __lwt_schedule	lwt.c	/^__lwt_schedule(void)$/;"	f
+__lwt_schedule	scheddev/lwt.c	/^__lwt_schedule(void)$/;"	f
 __lwt_start	lwt.c	/^__lwt_start()$/;"	f
+__lwt_start	scheddev/lwt.c	/^__lwt_start()$/;"	f
 _global_counter_t	include/lwt.h	/^typedef struct _global_counter_t$/;"	s
+_global_counter_t	scheddev/include/lwt.h	/^typedef struct _global_counter_t$/;"	s
 _lwt_t	include/lwt.h	/^typedef struct _lwt_t$/;"	s
+_lwt_t	scheddev/include/lwt.h	/^typedef struct _lwt_t$/;"	s
 a	main3.c	/^int a;$/;"	v
+a	scheddev/main3.c	/^int a;$/;"	v
+assert	scheddev/sl_thd.h	28;"	d
+assert	scheddev/unit_schedlib.c	15;"	d	file:
+assert	scheddev/unit_schedlib.c	16;"	d	file:
 async_sz	main3.c	/^static int async_sz = 0;$/;"	v	file:
+async_sz	scheddev/main3.c	/^static int async_sz = 0;$/;"	v	file:
 blocked_counter	include/lwt.h	/^	uint blocked_counter;$/;"	m	struct:_global_counter_t
-c	include/lwt.h	/^	lwt_chan_t c;$/;"	m	struct:__kthd_parm_t
+blocked_counter	scheddev/include/lwt.h	/^	uint blocked_counter;$/;"	m	struct:_global_counter_t
+c	scheddev/include/lwt.h	/^	lwt_chan_t c;$/;"	m	struct:__kthd_parm_t
 cgroup	include/lwt.h	/^typedef struct cgroup$/;"	s
 cgroup	include/lwt.h	/^} cgroup, *lwt_cgrp_t;$/;"	t	typeref:struct:cgroup
+cgroup	scheddev/include/lwt.h	/^typedef struct cgroup$/;"	s
+cgroup	scheddev/include/lwt.h	/^} cgroup, *lwt_cgrp_t;$/;"	t	typeref:struct:cgroup
 cgrp	include/lwt.h	/^	lwt_cgrp_t cgrp;		\/\/ belongs to which group$/;"	m	struct:lwt_channel
+cgrp	scheddev/include/lwt.h	/^	lwt_cgrp_t cgrp;		\/\/ belongs to which group$/;"	m	struct:lwt_channel
+ci	scheddev/kalloc.c	/^struct cos_compinfo *ci;$/;"	v	typeref:struct:cos_compinfo
 clist_head	include/lwt.h	/^typedef struct clist_head$/;"	s
 clist_head	include/lwt.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
+clist_head	scheddev/include/lwt.h	/^typedef struct clist_head$/;"	s
+clist_head	scheddev/include/lwt.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
 clist_t	include/lwt.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
+clist_t	scheddev/include/lwt.h	/^} clist_head, *clist_t;$/;"	t	typeref:struct:clist_head
+contention	scheddev/sl.h	/^			u32_t    contention :1;$/;"	m	struct:sl_cs::sl_cs_intern::__anon1
+cos_init	scheddev/unit_schedlib.c	/^cos_init(void)$/;"	f
+cos_llprint	scheddev/unit_schedlib.c	/^cos_llprint(char *s, int len)$/;"	f	file:
 curr	main1.c	/^volatile int curr = 0;$/;"	v
 curr	main3.c	/^volatile int curr = 0;$/;"	v
+curr	scheddev/main3.c	/^volatile int curr = 0;$/;"	v
+cyc_per_usec	scheddev/sl.h	/^	int            cyc_per_usec;$/;"	m	struct:sl_global
 data	include/lwt.h	/^	void* data;$/;"	m	struct:_lwt_t
 data	include/lwt.h	/^	void* data;$/;"	m	struct:clist_head
 data	include/lwt.h	/^	void** data;  $/;"	m	struct:ring_buffer
+data	scheddev/include/lwt.h	/^	void* data;$/;"	m	struct:_lwt_t
+data	scheddev/include/lwt.h	/^	void* data;$/;"	m	struct:clist_head
+data	scheddev/include/lwt.h	/^	void** data;  $/;"	m	struct:ring_buffer
 data_buffer	include/lwt.h	/^	ring_buffer data_buffer;$/;"	m	struct:lwt_channel
+data_buffer	scheddev/include/lwt.h	/^	ring_buffer data_buffer;$/;"	m	struct:lwt_channel
+debug_print	scheddev/sl_thd.h	30;"	d
+debug_print	scheddev/unit_schedlib.c	18;"	d	file:
+dependency	scheddev/sl_thd.h	/^	struct sl_thd *dependency;$/;"	m	struct:sl_thd	typeref:struct:sl_thd::sl_thd
 died_counter	include/lwt.h	/^	uint died_counter;$/;"	m	struct:_global_counter_t
+died_counter	scheddev/include/lwt.h	/^	uint died_counter;$/;"	m	struct:_global_counter_t
 end	include/lwt.h	/^	int end;$/;"	m	struct:ring_buffer
+end	scheddev/include/lwt.h	/^	int end;$/;"	m	struct:ring_buffer
 events	include/lwt.h	/^	struct lwt_channel *events;$/;"	m	struct:cgroup	typeref:struct:cgroup::lwt_channel
-fn	include/lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:__kthd_parm_t
+events	scheddev/include/lwt.h	/^	struct lwt_channel *events;$/;"	m	struct:cgroup	typeref:struct:cgroup::lwt_channel
 fn	include/lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:_lwt_t
+fn	scheddev/include/lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:__kthd_parm_t
+fn	scheddev/include/lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:_lwt_t
+fn	scheddev/unit_schedlib.c	/^fn(void)$/;"	f
+fn1	scheddev/unit_schedlib.c	/^fn1(lwt_chan_t from)$/;"	f
+fn2	scheddev/unit_schedlib.c	/^fn2(lwt_chan_t to)$/;"	f
+fn_arcv	scheddev/unit_schedlib.c	/^fn_arcv(lwt_chan_t from)$/;"	f
+fn_asnd	scheddev/unit_schedlib.c	/^fn_asnd(lwt_chan_t to)$/;"	f
 fn_async_steam	main3.c	/^fn_async_steam(lwt_chan_t to)$/;"	f
+fn_async_steam	scheddev/main3.c	/^fn_async_steam(lwt_chan_t to)$/;"	f
 fn_bounce	main1.c	/^fn_bounce(void *d) $/;"	f
 fn_bounce	main3.c	/^fn_bounce(void *d) $/;"	f
+fn_bounce	scheddev/main3.c	/^fn_bounce(void *d) $/;"	f
 fn_chan	main3.c	/^fn_chan(lwt_chan_t to)$/;"	f
+fn_chan	scheddev/main3.c	/^fn_chan(lwt_chan_t to)$/;"	f
+fn_cpy	scheddev/unit_schedlib.c	/^fn_cpy(void)$/;"	f
 fn_grpwait	main3.c	/^fn_grpwait(lwt_chan_t c)$/;"	f
+fn_grpwait	scheddev/main3.c	/^fn_grpwait(lwt_chan_t c)$/;"	f
 fn_identity	main1.c	/^fn_identity(void *d)$/;"	f
 fn_identity	main3.c	/^fn_identity(void *d)$/;"	f
+fn_identity	scheddev/main3.c	/^fn_identity(void *d)$/;"	f
 fn_join	main1.c	/^fn_join(void *d)$/;"	f
 fn_join	main3.c	/^fn_join(void *d)$/;"	f
+fn_join	scheddev/main3.c	/^fn_join(void *d)$/;"	f
 fn_nested_joins	main1.c	/^fn_nested_joins(void *d)$/;"	f
 fn_nested_joins	main3.c	/^fn_nested_joins(void *d)$/;"	f
+fn_nested_joins	scheddev/main3.c	/^fn_nested_joins(void *d)$/;"	f
 fn_null	main1.c	/^fn_null(void *d)$/;"	f
 fn_null	main3.c	/^fn_null(void *d)$/;"	f
+fn_null	scheddev/main3.c	/^fn_null(void *d)$/;"	f
+fn_print	scheddev/unit_schedlib.c	/^fn_print(void* data)$/;"	f
+fn_rcv_thd	scheddev/unit_schedlib.c	/^fn_rcv_thd(lwt_chan_t from)$/;"	f
 fn_sequence	main1.c	/^fn_sequence(void *d)$/;"	f
 fn_sequence	main3.c	/^fn_sequence(void *d)$/;"	f
+fn_sequence	scheddev/main3.c	/^fn_sequence(void *d)$/;"	f
+fn_snd_thd	scheddev/unit_schedlib.c	/^fn_snd_thd(lwt_chan_t to)$/;"	f
 fn_snder	main3.c	/^fn_snder(lwt_chan_t c, int v)$/;"	f
+fn_snder	scheddev/main3.c	/^fn_snder(lwt_chan_t c, int v)$/;"	f
 fn_snder_1	main3.c	/^void *fn_snder_1(lwt_chan_t c) { return fn_snder(c, 1); }$/;"	f
+fn_snder_1	scheddev/main3.c	/^void *fn_snder_1(lwt_chan_t c) { return fn_snder(c, 1); }$/;"	f
 fn_snder_2	main3.c	/^void *fn_snder_2(lwt_chan_t c) { return fn_snder(c, 2); }$/;"	f
+fn_snder_2	scheddev/main3.c	/^void *fn_snder_2(lwt_chan_t c) { return fn_snder(c, 2); }$/;"	f
 freelist	kalloc.c	/^}*freelist;$/;"	v	typeref:struct:run
+freelist	scheddev/kalloc.c	/^}*freelist;$/;"	v	typeref:struct:run
 gcounter	include/lwt.h	/^global_counter_t gcounter;$/;"	v
+gcounter	scheddev/include/lwt.h	/^global_counter_t gcounter;$/;"	v
 global_counter_t	include/lwt.h	/^}global_counter_t;$/;"	t	typeref:struct:_global_counter_t
+global_counter_t	scheddev/include/lwt.h	/^}global_counter_t;$/;"	t	typeref:struct:_global_counter_t
 id	include/lwt.h	/^	int id;     \/* channel's id*\/$/;"	m	struct:lwt_channel
 id	include/lwt.h	/^	int id;$/;"	m	struct:cgroup
 id	include/lwt.h	/^	uint id;$/;"	m	struct:_lwt_t
+id	scheddev/include/lwt.h	/^	int id;     \/* channel's id*\/$/;"	m	struct:lwt_channel
+id	scheddev/include/lwt.h	/^	int id;$/;"	m	struct:cgroup
+id	scheddev/include/lwt.h	/^	uint id;$/;"	m	struct:_lwt_t
+idle_thd	scheddev/sl.h	/^	struct sl_thd *idle_thd;$/;"	m	struct:sl_global	typeref:struct:sl_global::sl_thd
 ip	include/lwt.h	/^	ulong ip;$/;"	m	struct:_lwt_t
+ip	scheddev/include/lwt.h	/^	ulong ip;$/;"	m	struct:_lwt_t
 iscgrp	include/lwt.h	/^	int iscgrp;            \/\/check if it added to a group$/;"	m	struct:lwt_channel
+iscgrp	scheddev/include/lwt.h	/^	int iscgrp;            \/\/check if it added to a group$/;"	m	struct:lwt_channel
 joiner	include/lwt.h	/^	struct _lwt_t *joiner;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
+joiner	scheddev/include/lwt.h	/^	struct _lwt_t *joiner;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
 kalloc	kalloc.c	/^kalloc(int n)$/;"	f
+kalloc	scheddev/kalloc.c	/^kalloc(int n)$/;"	f
 kfree	kalloc.c	/^kfree(char *v, int len)$/;"	f
+kfree	scheddev/kalloc.c	/^kfree(char *v, int len)$/;"	f
 kinit	kalloc.c	/^kinit(void)$/;"	f
-kthd	include/lwt.h	/^	struct sl_thd* kthd;$/;"	m	struct:__kthd_parm_t	typeref:struct:__kthd_parm_t::sl_thd
-kthd_parm_t	include/lwt.h	/^}*kthd_parm_t;$/;"	t	typeref:struct:__kthd_parm_t
+kinit	scheddev/kalloc.c	/^kinit(void)$/;"	f
+kthd	scheddev/include/lwt.h	/^	struct sl_thd* kthd;$/;"	m	struct:__kthd_parm_t	typeref:struct:__kthd_parm_t::sl_thd
+kthd_parm_t	scheddev/include/lwt.h	/^}*kthd_parm_t;$/;"	t	typeref:struct:__kthd_parm_t
 l	include/ps_list.h	/^	struct ps_list l;$/;"	m	struct:ps_list_head	typeref:struct:ps_list_head::ps_list
+l	scheddev/include/ps_list.h	/^	struct ps_list l;$/;"	m	struct:ps_list_head	typeref:struct:ps_list_head::ps_list
 len	kalloc.c	/^  int len;$/;"	m	struct:run	file:
+len	scheddev/kalloc.c	/^  int len;$/;"	m	struct:run	file:
 list	include/lwt.h	/^	struct ps_list list;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::ps_list
 list	include/lwt.h	/^	struct ps_list list;$/;"	m	struct:clist_head	typeref:struct:clist_head::ps_list
 list	include/lwt.h	/^	struct ps_list list;$/;"	m	struct:lwt_channel	typeref:struct:lwt_channel::ps_list
-lwt	include/lwt.h	/^	lwt_t lwt;$/;"	m	struct:__kthd_parm_t
+list	scheddev/include/lwt.h	/^	struct ps_list list;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::ps_list
+list	scheddev/include/lwt.h	/^	struct ps_list list;$/;"	m	struct:clist_head	typeref:struct:clist_head::ps_list
+list	scheddev/include/lwt.h	/^	struct ps_list list;$/;"	m	struct:lwt_channel	typeref:struct:lwt_channel::ps_list
+list	scheddev/sl_mod_policy.h	/^	struct ps_list list;$/;"	m	struct:sl_thd_policy	typeref:struct:sl_thd_policy::ps_list
+list	scheddev/sl_policy.h	/^	struct ps_list list;$/;"	m	struct:sl_thd_policy	typeref:struct:sl_thd_policy::ps_list
+lm_fn_chan	compare_test_file.c	/^lm_fn_chan(lwt_chan_t to)$/;"	f
+lm_fn_identity	compare_test_file.c	/^lm_fn_identity(void *d)$/;"	f
+lm_fn_multiwait	compare_test_file.c	/^lm_fn_multiwait(void *d)$/;"	f
+lm_fn_null	compare_test_file.c	/^lm_fn_null(void *d)$/;"	f
+lock	scheddev/sl.h	/^	struct sl_cs   lock;$/;"	m	struct:sl_global	typeref:struct:sl_global::sl_cs
+lwt	scheddev/include/lwt.h	/^	lwt_t lwt;$/;"	m	struct:__kthd_parm_t
 lwt_cgrp	lwt.c	/^lwt_cgrp(void)$/;"	f
+lwt_cgrp	scheddev/lwt.c	/^lwt_cgrp(void)$/;"	f
 lwt_cgrp_add	lwt.c	/^int lwt_cgrp_add(lwt_cgrp_t cgrp, lwt_chan_t c)$/;"	f
+lwt_cgrp_add	scheddev/lwt.c	/^int lwt_cgrp_add(lwt_cgrp_t cgrp, lwt_chan_t c)$/;"	f
 lwt_cgrp_free	lwt.c	/^lwt_cgrp_free(lwt_cgrp_t cgrp)$/;"	f
+lwt_cgrp_free	scheddev/lwt.c	/^lwt_cgrp_free(lwt_cgrp_t cgrp)$/;"	f
 lwt_cgrp_rem	lwt.c	/^int lwt_cgrp_rem(lwt_cgrp_t cgrp, lwt_chan_t c)$/;"	f
+lwt_cgrp_rem	scheddev/lwt.c	/^int lwt_cgrp_rem(lwt_cgrp_t cgrp, lwt_chan_t c)$/;"	f
 lwt_cgrp_t	include/lwt.h	/^} cgroup, *lwt_cgrp_t;$/;"	t	typeref:struct:cgroup
+lwt_cgrp_t	scheddev/include/lwt.h	/^} cgroup, *lwt_cgrp_t;$/;"	t	typeref:struct:cgroup
 lwt_cgrp_wait	lwt.c	/^lwt_chan_t lwt_cgrp_wait(lwt_cgrp_t cgrp)$/;"	f
+lwt_cgrp_wait	scheddev/lwt.c	/^lwt_chan_t lwt_cgrp_wait(lwt_cgrp_t cgrp)$/;"	f
 lwt_chan	lwt.c	/^lwt_chan(int sz)$/;"	f
+lwt_chan	scheddev/lwt.c	/^lwt_chan(int sz)$/;"	f
 lwt_chan_deref	lwt.c	/^lwt_chan_deref(lwt_chan_t c)$/;"	f
+lwt_chan_deref	scheddev/lwt.c	/^lwt_chan_deref(lwt_chan_t c)$/;"	f
 lwt_chan_fn_t	include/lwt.h	/^typedef void *(*lwt_chan_fn_t)(lwt_chan_t);$/;"	t
+lwt_chan_fn_t	scheddev/include/lwt.h	/^typedef void *(*lwt_chan_fn_t)(lwt_chan_t);$/;"	t
 lwt_chan_mark_get	lwt.c	/^void *lwt_chan_mark_get(lwt_chan_t c)$/;"	f
+lwt_chan_mark_get	scheddev/lwt.c	/^void *lwt_chan_mark_get(lwt_chan_t c)$/;"	f
 lwt_chan_mark_set	lwt.c	/^void lwt_chan_mark_set(lwt_chan_t c, void *data)$/;"	f
+lwt_chan_mark_set	scheddev/lwt.c	/^void lwt_chan_mark_set(lwt_chan_t c, void *data)$/;"	f
 lwt_chan_t	include/lwt.h	/^} lwt_channel, *lwt_chan_t;$/;"	t	typeref:struct:lwt_channel
+lwt_chan_t	scheddev/include/lwt.h	/^} lwt_channel, *lwt_chan_t;$/;"	t	typeref:struct:lwt_channel
 lwt_channel	include/lwt.h	/^typedef struct lwt_channel $/;"	s
 lwt_channel	include/lwt.h	/^} lwt_channel, *lwt_chan_t;$/;"	t	typeref:struct:lwt_channel
+lwt_channel	scheddev/include/lwt.h	/^typedef struct lwt_channel $/;"	s
+lwt_channel	scheddev/include/lwt.h	/^} lwt_channel, *lwt_chan_t;$/;"	t	typeref:struct:lwt_channel
 lwt_count	include/lwt.h	/^	uint lwt_count;		$/;"	m	struct:_global_counter_t
+lwt_count	scheddev/include/lwt.h	/^	uint lwt_count;		$/;"	m	struct:_global_counter_t
 lwt_create	lwt.c	/^lwt_create(lwt_fn_t fn, void *data, lwt_flags_t flags)$/;"	f
+lwt_create	scheddev/lwt.c	/^lwt_create(lwt_fn_t fn, void *data, lwt_flags_t flags)$/;"	f
 lwt_create_chan	lwt.c	/^lwt_create_chan(lwt_chan_fn_t fn, lwt_chan_t c, lwt_flags_t flag)$/;"	f
-lwt_curr	include/lwt.h	/^lwt_t lwt_curr;$/;"	v
+lwt_create_chan	scheddev/lwt.c	/^lwt_create_chan(lwt_chan_fn_t fn, lwt_chan_t c, lwt_flags_t flag)$/;"	f
 lwt_current	lwt.c	/^lwt_current(void)$/;"	f
+lwt_current	scheddev/lwt.c	/^lwt_current(void)$/;"	f
 lwt_die	lwt.c	/^lwt_die(void *data)$/;"	f
-lwt_flags_t	include/lwt.h	/^}lwt_flags_t;$/;"	t	typeref:enum:__anon3
+lwt_die	scheddev/lwt.c	/^lwt_die(void *data)$/;"	f
+lwt_flags_t	include/lwt.h	/^}lwt_flags_t;$/;"	t	typeref:enum:__anon8
+lwt_flags_t	scheddev/include/lwt.h	/^}lwt_flags_t;$/;"	t	typeref:enum:__anon4
 lwt_fn_t	include/lwt.h	/^typedef void *(*lwt_fn_t) (void *);$/;"	t
+lwt_fn_t	scheddev/include/lwt.h	/^typedef void *(*lwt_fn_t) (void *);$/;"	t
 lwt_head	include/lwt.h	/^lwt_t lwt_head;$/;"	v
+lwt_head	scheddev/include/lwt.h	/^lwt_t lwt_head;$/;"	v
 lwt_id	lwt.c	/^lwt_id(lwt_t lwt)$/;"	f
+lwt_id	scheddev/lwt.c	/^lwt_id(lwt_t lwt)$/;"	f
 lwt_info	lwt.c	/^lwt_info(lwt_info_t t)$/;"	f
-lwt_info_t	include/lwt.h	/^} lwt_info_t;$/;"	t	typeref:enum:__anon1
+lwt_info	scheddev/lwt.c	/^lwt_info(lwt_info_t t)$/;"	f
+lwt_info_t	include/lwt.h	/^} lwt_info_t;$/;"	t	typeref:enum:__anon6
+lwt_info_t	scheddev/include/lwt.h	/^} lwt_info_t;$/;"	t	typeref:enum:__anon2
 lwt_init	lwt.c	/^lwt_init()  $/;"	f
+lwt_init	scheddev/lwt.c	/^lwt_init()  $/;"	f
 lwt_join	lwt.c	/^lwt_join(lwt_t lwt)$/;"	f
-lwt_kthd_create	lwt.c	/^int lwt_kthd_create(lwt_fn_t fn, lwt_chan_t c)$/;"	f
+lwt_join	scheddev/lwt.c	/^lwt_join(lwt_t lwt)$/;"	f
+lwt_kthd_create	scheddev/lwt.c	/^int lwt_kthd_create(lwt_fn_t fn, lwt_chan_t c)$/;"	f
 lwt_nojoin	include/lwt.h	/^	lwt_flags_t lwt_nojoin;	$/;"	m	struct:_lwt_t
+lwt_nojoin	scheddev/include/lwt.h	/^	lwt_flags_t lwt_nojoin;	$/;"	m	struct:_lwt_t
 lwt_rcv	lwt.c	/^*lwt_rcv(lwt_chan_t c)$/;"	f
+lwt_rcv	scheddev/lwt.c	/^*lwt_rcv(lwt_chan_t c)$/;"	f
 lwt_rcv_chan	lwt.c	/^lwt_rcv_chan(lwt_chan_t c)$/;"	f
+lwt_rcv_chan	scheddev/lwt.c	/^lwt_rcv_chan(lwt_chan_t c)$/;"	f
+lwt_rcv_thd	scheddev/lwt.c	/^lwt_t lwt_rcv_thd(lwt_chan_t c)$/;"	f
 lwt_snd	lwt.c	/^lwt_snd(lwt_chan_t c, void *data)$/;"	f
+lwt_snd	scheddev/lwt.c	/^lwt_snd(lwt_chan_t c, void *data)$/;"	f
 lwt_snd_chan	lwt.c	/^lwt_snd_chan(lwt_chan_t c, lwt_chan_t sending)$/;"	f
-lwt_status_t	include/lwt.h	/^}lwt_status_t;$/;"	t	typeref:enum:__anon2
+lwt_snd_chan	scheddev/lwt.c	/^lwt_snd_chan(lwt_chan_t c, lwt_chan_t sending)$/;"	f
+lwt_snd_thd	scheddev/lwt.c	/^int lwt_snd_thd(lwt_chan_t c, lwt_t sending)$/;"	f
+lwt_status_t	include/lwt.h	/^}lwt_status_t;$/;"	t	typeref:enum:__anon7
+lwt_status_t	scheddev/include/lwt.h	/^}lwt_status_t;$/;"	t	typeref:enum:__anon3
 lwt_t	include/lwt.h	/^}*lwt_t;$/;"	t	typeref:struct:_lwt_t
+lwt_t	scheddev/include/lwt.h	/^}*lwt_t;$/;"	t	typeref:struct:_lwt_t
 lwt_yield	lwt.c	/^lwt_yield(lwt_t lwt)$/;"	f
+lwt_yield	scheddev/lwt.c	/^lwt_yield(lwt_t lwt)$/;"	f
 main	main1.c	/^main(void)$/;"	f
 main	main3.c	/^main(void)$/;"	f
+maintest	scheddev/main3.c	/^maintest(void)$/;"	f
 mark	include/lwt.h	/^	void *mark;$/;"	m	struct:lwt_channel
+mark	scheddev/include/lwt.h	/^	void *mark;$/;"	m	struct:lwt_channel
 n	include/ps_list.h	/^	struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::ps_list
+n	scheddev/include/ps_list.h	/^	struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::ps_list
 n_chan	include/lwt.h	/^	int n_chan;          \/\/number of channels in the group$/;"	m	struct:cgroup
+n_chan	scheddev/include/lwt.h	/^	int n_chan;          \/\/number of channels in the group$/;"	m	struct:cgroup
 nchan_counter	include/lwt.h	/^	uint nchan_counter;$/;"	m	struct:_global_counter_t
+nchan_counter	scheddev/include/lwt.h	/^	uint nchan_counter;$/;"	m	struct:_global_counter_t
 nchan_id	include/lwt.h	/^	uint nchan_id;$/;"	m	struct:_global_counter_t
+nchan_id	scheddev/include/lwt.h	/^	uint nchan_id;$/;"	m	struct:_global_counter_t
 next	kalloc.c	/^  struct run *next;$/;"	m	struct:run	typeref:struct:run::run	file:
+next	scheddev/kalloc.c	/^  struct run *next;$/;"	m	struct:run	typeref:struct:run::run	file:
 nrcving_counter	include/lwt.h	/^	uint nrcving_counter;$/;"	m	struct:_global_counter_t
+nrcving_counter	scheddev/include/lwt.h	/^	uint nrcving_counter;$/;"	m	struct:_global_counter_t
 nsnding_counter	include/lwt.h	/^	uint nsnding_counter;$/;"	m	struct:_global_counter_t
+nsnding_counter	scheddev/include/lwt.h	/^	uint nsnding_counter;$/;"	m	struct:_global_counter_t
+owner	scheddev/sl.h	/^			thdcap_t owner      :31;$/;"	m	struct:sl_cs::sl_cs_intern::__anon1
 p	include/ps_list.h	/^	struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::
+p	scheddev/include/ps_list.h	/^	struct ps_list *n, *p;$/;"	m	struct:ps_list	typeref:struct:ps_list::
+period	scheddev/sl.h	/^	cycles_t       period;$/;"	m	struct:sl_global
+period	scheddev/sl_mod_policy.h	/^	cycles_t       period;$/;"	m	struct:sl_thd_policy
+period	scheddev/sl_policy.h	/^	cycles_t       period;$/;"	m	struct:sl_thd_policy
+period_usec	scheddev/sl_mod_policy.h	/^	microsec_t     period_usec;$/;"	m	struct:sl_thd_policy
+period_usec	scheddev/sl_policy.h	/^	microsec_t     period_usec;$/;"	m	struct:sl_thd_policy
 pr	main3.c	/^void* pr()$/;"	f
+printc	scheddev/unit_schedlib.c	/^printc(char *fmt, ...)$/;"	f
+prints	scheddev/unit_schedlib.c	/^prints(char *s)$/;"	f
+prio	scheddev/sl_thd.h	/^	tcap_prio_t    prio;$/;"	m	struct:sl_thd
+priority	scheddev/sl_mod_policy.h	/^	tcap_prio_t    priority;$/;"	m	struct:sl_thd_policy
+priority	scheddev/sl_policy.h	/^	tcap_prio_t    priority;$/;"	m	struct:sl_thd_policy
 ps_container	include/ps_list.h	103;"	d
+ps_container	scheddev/include/ps_list.h	103;"	d
 ps_list	include/ps_list.h	/^struct ps_list {$/;"	s
+ps_list	scheddev/include/ps_list.h	/^struct ps_list {$/;"	s
 ps_list_add	include/ps_list.h	130;"	d
+ps_list_add	scheddev/include/ps_list.h	130;"	d
 ps_list_add_d	include/ps_list.h	152;"	d
+ps_list_add_d	scheddev/include/ps_list.h	152;"	d
 ps_list_append	include/ps_list.h	131;"	d
+ps_list_append	scheddev/include/ps_list.h	131;"	d
 ps_list_append_d	include/ps_list.h	153;"	d
+ps_list_append_d	scheddev/include/ps_list.h	153;"	d
 ps_list_foreach	include/ps_list.h	166;"	d
+ps_list_foreach	scheddev/include/ps_list.h	166;"	d
 ps_list_foreach_d	include/ps_list.h	171;"	d
+ps_list_foreach_d	scheddev/include/ps_list.h	171;"	d
 ps_list_foreach_del	include/ps_list.h	181;"	d
+ps_list_foreach_del	scheddev/include/ps_list.h	181;"	d
 ps_list_foreach_del_d	include/ps_list.h	187;"	d
+ps_list_foreach_del_d	scheddev/include/ps_list.h	187;"	d
 ps_list_head	include/ps_list.h	/^struct ps_list_head {$/;"	s
+ps_list_head	scheddev/include/ps_list.h	/^struct ps_list_head {$/;"	s
 ps_list_head_add	include/ps_list.h	133;"	d
+ps_list_head_add	scheddev/include/ps_list.h	133;"	d
 ps_list_head_add_d	include/ps_list.h	158;"	d
+ps_list_head_add_d	scheddev/include/ps_list.h	158;"	d
 ps_list_head_append	include/ps_list.h	134;"	d
+ps_list_head_append	scheddev/include/ps_list.h	134;"	d
 ps_list_head_append_d	include/ps_list.h	159;"	d
+ps_list_head_append_d	scheddev/include/ps_list.h	159;"	d
 ps_list_head_empty	include/ps_list.h	/^ps_list_head_empty(struct ps_list_head *lh)$/;"	f
+ps_list_head_empty	scheddev/include/ps_list.h	/^ps_list_head_empty(struct ps_list_head *lh)$/;"	f
 ps_list_head_first	include/ps_list.h	141;"	d
+ps_list_head_first	scheddev/include/ps_list.h	141;"	d
 ps_list_head_first_d	include/ps_list.h	157;"	d
+ps_list_head_first_d	scheddev/include/ps_list.h	157;"	d
 ps_list_head_init	include/ps_list.h	/^ps_list_head_init(struct ps_list_head *lh)$/;"	f
+ps_list_head_init	scheddev/include/ps_list.h	/^ps_list_head_init(struct ps_list_head *lh)$/;"	f
 ps_list_head_last	include/ps_list.h	143;"	d
+ps_list_head_last	scheddev/include/ps_list.h	143;"	d
 ps_list_head_last_d	include/ps_list.h	156;"	d
+ps_list_head_last_d	scheddev/include/ps_list.h	156;"	d
 ps_list_init	include/ps_list.h	127;"	d
+ps_list_init	scheddev/include/ps_list.h	127;"	d
 ps_list_init_d	include/ps_list.h	149;"	d
+ps_list_init_d	scheddev/include/ps_list.h	149;"	d
 ps_list_is_head	include/ps_list.h	123;"	d
+ps_list_is_head	scheddev/include/ps_list.h	123;"	d
 ps_list_is_head_d	include/ps_list.h	147;"	d
+ps_list_is_head_d	scheddev/include/ps_list.h	147;"	d
 ps_list_ll_add	include/ps_list.h	/^ps_list_ll_add(struct ps_list *l, struct ps_list *new)$/;"	f
+ps_list_ll_add	scheddev/include/ps_list.h	/^ps_list_ll_add(struct ps_list *l, struct ps_list *new)$/;"	f
 ps_list_ll_empty	include/ps_list.h	/^ps_list_ll_empty(struct ps_list *l)$/;"	f
+ps_list_ll_empty	scheddev/include/ps_list.h	/^ps_list_ll_empty(struct ps_list *l)$/;"	f
 ps_list_ll_init	include/ps_list.h	/^ps_list_ll_init(struct ps_list *l)$/;"	f
+ps_list_ll_init	scheddev/include/ps_list.h	/^ps_list_ll_init(struct ps_list *l)$/;"	f
 ps_list_ll_rem	include/ps_list.h	/^ps_list_ll_rem(struct ps_list *l)$/;"	f
+ps_list_ll_rem	scheddev/include/ps_list.h	/^ps_list_ll_rem(struct ps_list *l)$/;"	f
 ps_list_next	include/ps_list.h	128;"	d
+ps_list_next	scheddev/include/ps_list.h	128;"	d
 ps_list_next_d	include/ps_list.h	150;"	d
+ps_list_next_d	scheddev/include/ps_list.h	150;"	d
 ps_list_obj_get	include/ps_list.h	113;"	d
+ps_list_obj_get	scheddev/include/ps_list.h	113;"	d
 ps_list_prev	include/ps_list.h	129;"	d
+ps_list_prev	scheddev/include/ps_list.h	129;"	d
 ps_list_prev_d	include/ps_list.h	151;"	d
+ps_list_prev_d	scheddev/include/ps_list.h	151;"	d
 ps_list_rem	include/ps_list.h	132;"	d
+ps_list_rem	scheddev/include/ps_list.h	132;"	d
 ps_list_rem_d	include/ps_list.h	154;"	d
+ps_list_rem_d	scheddev/include/ps_list.h	154;"	d
 ps_list_singleton	include/ps_list.h	126;"	d
+ps_list_singleton	scheddev/include/ps_list.h	126;"	d
 ps_list_singleton_d	include/ps_list.h	148;"	d
+ps_list_singleton_d	scheddev/include/ps_list.h	148;"	d
 ps_offsetof	include/ps_list.h	100;"	d
+ps_offsetof	scheddev/include/ps_list.h	100;"	d
 rcv_blocked	include/lwt.h	/^	int rcv_blocked;$/;"	m	struct:lwt_channel
+rcv_blocked	scheddev/include/lwt.h	/^	int rcv_blocked;$/;"	m	struct:lwt_channel
 rcv_thd	include/lwt.h	/^	lwt_t rcv_thd;	 			\/* the receiver *\/$/;"	m	struct:lwt_channel
+rcv_thd	scheddev/include/lwt.h	/^	lwt_t rcv_thd;	 			\/* the receiver *\/$/;"	m	struct:lwt_channel
+rdtscll	compare_test_file.c	7;"	d	file:
 rdtscll	main1.c	7;"	d	file:
 rdtscll	main3.c	7;"	d	file:
+rdtscll	scheddev/main3.c	9;"	d	file:
 return_val	include/lwt.h	/^	void *return_val;$/;"	m	struct:_lwt_t
+return_val	scheddev/include/lwt.h	/^	void *return_val;$/;"	m	struct:_lwt_t
 ring_buffer	include/lwt.h	/^typedef struct ring_buffer $/;"	s
 ring_buffer	include/lwt.h	/^} ring_buffer;$/;"	t	typeref:struct:ring_buffer
+ring_buffer	scheddev/include/lwt.h	/^typedef struct ring_buffer $/;"	s
+ring_buffer	scheddev/include/lwt.h	/^} ring_buffer;$/;"	t	typeref:struct:ring_buffer
 run	kalloc.c	/^struct run {$/;"	s	file:
+run	scheddev/kalloc.c	/^struct run {$/;"	s	file:
+run_lm_tests	compare_test_file.c	/^run_lm_tests()$/;"	f
 runable_counter	include/lwt.h	/^	uint runable_counter;$/;"	m	struct:_global_counter_t
+runable_counter	scheddev/include/lwt.h	/^	uint runable_counter;$/;"	m	struct:_global_counter_t
+s	scheddev/sl.h	/^		} PS_PACKED s;$/;"	m	union:sl_cs::sl_cs_intern	typeref:struct:sl_cs::sl_cs_intern::__anon1
 sched	main1.c	/^volatile int sched[2] = {0, 0};$/;"	v
 sched	main3.c	/^volatile int sched[2] = {0, 0};$/;"	v
+sched	scheddev/main3.c	/^volatile int sched[2] = {0, 0};$/;"	v
+sched_thd	scheddev/sl.h	/^	struct sl_thd *sched_thd;$/;"	m	struct:sl_global	typeref:struct:sl_global::sl_thd
+sched_thdcap	scheddev/sl.h	/^	thdcap_t       sched_thdcap;$/;"	m	struct:sl_global
 size	include/lwt.h	/^	int size;$/;"	m	struct:ring_buffer
+size	scheddev/include/lwt.h	/^	int size;$/;"	m	struct:ring_buffer
+sl__globals	scheddev/sl.h	/^sl__globals(void)$/;"	f
+sl_cs	scheddev/sl.h	/^struct sl_cs {$/;"	s
+sl_cs_enter	scheddev/sl.h	/^sl_cs_enter(void)$/;"	f
+sl_cs_enter_contention	scheddev/sl.c	/^sl_cs_enter_contention(union sl_cs_intern *csi, union sl_cs_intern *cached, thdcap_t curr, sched_tok_t tok)$/;"	f
+sl_cs_exit	scheddev/sl.h	/^sl_cs_exit(void)$/;"	f
+sl_cs_exit_contention	scheddev/sl.c	/^sl_cs_exit_contention(union sl_cs_intern *csi, union sl_cs_intern *cached, sched_tok_t tok)$/;"	f
+sl_cs_exit_schedule	scheddev/sl.h	/^sl_cs_exit_schedule(void)$/;"	f
+sl_cs_exit_schedule_nospin	scheddev/sl.h	/^sl_cs_exit_schedule_nospin(void)$/;"	f
+sl_cs_exit_schedule_nospin_arg	scheddev/sl.h	/^sl_cs_exit_schedule_nospin_arg(struct sl_thd *to)$/;"	f
+sl_cs_exit_switchto	scheddev/sl.h	/^sl_cs_exit_switchto(struct sl_thd *to)$/;"	f
+sl_cs_intern	scheddev/sl.h	/^	union sl_cs_intern {$/;"	u	struct:sl_cs
+sl_cs_owner	scheddev/sl.h	/^sl_cs_owner(void)$/;"	f
+sl_cyc2usec	scheddev/sl.h	/^sl_cyc2usec(cycles_t cyc)$/;"	f
+sl_global	scheddev/sl.h	/^struct sl_global {$/;"	s
+sl_global_data	scheddev/sl.c	/^struct sl_global sl_global_data;$/;"	v	typeref:struct:sl_global
+sl_idle	scheddev/sl.c	/^sl_idle(void *d)$/;"	f
+sl_init	scheddev/sl.c	/^sl_init(void)$/;"	f
+sl_mod_block	scheddev/sl_mod_fprr.c	/^sl_mod_block(struct sl_thd_policy *t)$/;"	f
+sl_mod_execution	scheddev/sl_mod_fprr.c	/^sl_mod_execution(struct sl_thd_policy *t, cycles_t cycles)$/;"	f
+sl_mod_init	scheddev/sl_mod_fprr.c	/^sl_mod_init(void)$/;"	f
+sl_mod_schedule	scheddev/sl_mod_fprr.c	/^sl_mod_schedule(void)$/;"	f
+sl_mod_thd_create	scheddev/sl_mod_fprr.c	/^sl_mod_thd_create(struct sl_thd_policy *t)$/;"	f
+sl_mod_thd_delete	scheddev/sl_mod_fprr.c	/^sl_mod_thd_delete(struct sl_thd_policy *t)$/;"	f
+sl_mod_thd_get	scheddev/sl_mod_policy.h	/^sl_mod_thd_get(struct sl_thd_policy *tp)$/;"	f
+sl_mod_thd_get	scheddev/sl_policy.h	/^sl_mod_thd_get(struct sl_thd_policy *tp)$/;"	f
+sl_mod_thd_param_set	scheddev/sl_mod_fprr.c	/^sl_mod_thd_param_set(struct sl_thd_policy *t, sched_param_type_t type, unsigned int v)$/;"	f
+sl_mod_thd_policy_get	scheddev/sl_mod_policy.h	/^sl_mod_thd_policy_get(struct sl_thd *t)$/;"	f
+sl_mod_thd_policy_get	scheddev/sl_policy.h	/^sl_mod_thd_policy_get(struct sl_thd *t)$/;"	f
+sl_mod_wakeup	scheddev/sl_mod_fprr.c	/^sl_mod_wakeup(struct sl_thd_policy *t)$/;"	f
+sl_mod_yield	scheddev/sl_mod_fprr.c	/^sl_mod_yield(struct sl_thd_policy *t, struct sl_thd_policy *yield_to)$/;"	f
+sl_now	scheddev/sl.h	/^sl_now(void)$/;"	f
+sl_sched_loop	scheddev/sl.c	/^sl_sched_loop(void)$/;"	f
+sl_thd	scheddev/sl_thd.h	/^struct sl_thd {$/;"	s
+sl_thd_alloc	scheddev/sl.c	/^sl_thd_alloc(cos_thd_fn_t fn, void *data)$/;"	f
+sl_thd_alloc_backend	scheddev/sl_thd_static_backend.c	/^sl_thd_alloc_backend(thdid_t tid)$/;"	f
+sl_thd_alloc_init	scheddev/sl.c	/^sl_thd_alloc_init(thdid_t tid, thdcap_t thdcap)$/;"	f	file:
+sl_thd_alloc_intern	scheddev/sl.c	/^sl_thd_alloc_intern(cos_thd_fn_t fn, void *data, struct cos_defcompinfo *comp, int boot_thd)$/;"	f	file:
+sl_thd_block	scheddev/sl.c	/^sl_thd_block(thdid_t tid)$/;"	f
+sl_thd_comp_alloc	scheddev/sl.c	/^sl_thd_comp_alloc(struct cos_defcompinfo *comp)$/;"	f
+sl_thd_curr	scheddev/sl.h	/^sl_thd_curr(void)$/;"	f
+sl_thd_free	scheddev/sl.c	/^sl_thd_free(struct sl_thd *t)$/;"	f
+sl_thd_free_backend	scheddev/sl_thd_static_backend.c	/^sl_thd_free_backend(struct sl_thd_policy *t)$/;"	f
+sl_thd_index_add_backend	scheddev/sl_thd_static_backend.c	/^sl_thd_index_add_backend(struct sl_thd_policy *t)$/;"	f
+sl_thd_index_rem_backend	scheddev/sl_thd_static_backend.c	/^sl_thd_index_rem_backend(struct sl_thd_policy *t)$/;"	f
+sl_thd_init_backend	scheddev/sl_thd_static_backend.c	/^sl_thd_init_backend(void)$/;"	f
+sl_thd_lkup	scheddev/sl.h	/^sl_thd_lkup(thdid_t tid)$/;"	f
+sl_thd_lookup_backend	scheddev/sl_thd_static_backend.c	/^sl_thd_lookup_backend(thdid_t tid)$/;"	f
+sl_thd_param_set	scheddev/sl.c	/^sl_thd_param_set(struct sl_thd *t, sched_param_t sp)$/;"	f
+sl_thd_policy	scheddev/sl_mod_policy.h	/^struct sl_thd_policy {$/;"	s
+sl_thd_policy	scheddev/sl_policy.h	/^struct sl_thd_policy {$/;"	s
+sl_thd_setprio	scheddev/sl.h	/^sl_thd_setprio(struct sl_thd *t, tcap_prio_t p)$/;"	f
+sl_thd_state	scheddev/sl_thd.h	/^} sl_thd_state;$/;"	t	typeref:enum:__anon5
+sl_thd_wakeup	scheddev/sl.c	/^sl_thd_wakeup(thdid_t tid)$/;"	f
+sl_thd_yield	scheddev/sl.c	/^sl_thd_yield(thdid_t tid)$/;"	f
+sl_threads	scheddev/sl_thd_static_backend.c	/^static struct sl_thd_policy sl_threads[MAX_NUM_THREADS];$/;"	v	typeref:struct:sl_thd_policy	file:
+sl_timeout_mod_expended	scheddev/sl_timer_mod_periodic.c	/^sl_timeout_mod_expended(microsec_t now, microsec_t oldtimeout)$/;"	f
+sl_timeout_mod_init	scheddev/sl_timer_mod_periodic.c	/^sl_timeout_mod_init(void)$/;"	f
+sl_timeout_oneshot	scheddev/sl.h	/^sl_timeout_oneshot(cycles_t absolute_us)$/;"	f
+sl_timeout_period	scheddev/sl.c	/^sl_timeout_period(microsec_t period)$/;"	f
+sl_timeout_period_get	scheddev/sl.h	/^sl_timeout_period_get(void)$/;"	f
+sl_timeout_relative	scheddev/sl.h	/^sl_timeout_relative(cycles_t offset)$/;"	f
+sl_usec2cyc	scheddev/sl.h	/^sl_usec2cyc(microsec_t usec)$/;"	f
 snd_cnt	include/lwt.h	/^	int snd_cnt; 				\/* number of sending threads *\/$/;"	m	struct:lwt_channel
+snd_cnt	scheddev/include/lwt.h	/^	int snd_cnt; 				\/* number of sending threads *\/$/;"	m	struct:lwt_channel
 snd_thds	include/lwt.h	/^	clist_t snd_thds;$/;"	m	struct:lwt_channel
+snd_thds	scheddev/include/lwt.h	/^	clist_t snd_thds;$/;"	m	struct:lwt_channel
 sndrcv_cnt	main3.c	/^static int sndrcv_cnt = 0;$/;"	v	file:
+sndrcv_cnt	scheddev/main3.c	/^static int sndrcv_cnt = 0;$/;"	v	file:
 sp	include/lwt.h	/^	ulong sp;$/;"	m	struct:_lwt_t
+sp	scheddev/include/lwt.h	/^	ulong sp;$/;"	m	struct:_lwt_t
 start	include/lwt.h	/^	int start;$/;"	m	struct:ring_buffer
+start	scheddev/include/lwt.h	/^	int start;$/;"	m	struct:ring_buffer
+state	scheddev/sl_thd.h	/^	sl_thd_state   state;$/;"	m	struct:sl_thd
 status	include/lwt.h	/^	lwt_status_t status;$/;"	m	struct:_lwt_t
+status	scheddev/include/lwt.h	/^	lwt_status_t status;$/;"	m	struct:_lwt_t
 target	include/lwt.h	/^	struct _lwt_t *target;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
+target	scheddev/include/lwt.h	/^	struct _lwt_t *target;$/;"	m	struct:_lwt_t	typeref:struct:_lwt_t::_lwt_t
+test_blocking_directed_yield	scheddev/unit_schedlib.c	/^test_blocking_directed_yield(void)$/;"	f
 test_crt_join_sched	main1.c	/^test_crt_join_sched(void)$/;"	f
 test_crt_join_sched	main3.c	/^test_crt_join_sched(void)$/;"	f
+test_crt_join_sched	scheddev/main3.c	/^test_crt_join_sched(void)$/;"	f
 test_grpwait	main3.c	/^test_grpwait(int chsz, int grpsz)$/;"	f
+test_grpwait	scheddev/main3.c	/^test_grpwait(int chsz, int grpsz)$/;"	f
+test_high	scheddev/unit_schedlib.c	/^test_high(void *data)$/;"	f
+test_low	scheddev/unit_schedlib.c	/^test_low(void *data)$/;"	f
+test_lwt_cgrp	compare_test_file.c	/^test_lwt_cgrp()$/;"	f
+test_lwt_channel	compare_test_file.c	/^test_lwt_channel()$/;"	f
+test_lwt_create	compare_test_file.c	/^test_lwt_create(void)$/;"	f
+test_lwt_yield	compare_test_file.c	/^test_lwt_yield(void)$/;"	f
 test_multisend	main3.c	/^test_multisend(int chsz)$/;"	f
+test_multisend	scheddev/main3.c	/^test_multisend(int chsz)$/;"	f
 test_perf	main1.c	/^test_perf(void)$/;"	f
 test_perf	main3.c	/^test_perf(void)$/;"	f
+test_perf	scheddev/main3.c	/^test_perf(void)$/;"	f
 test_perf_async_steam	main3.c	/^test_perf_async_steam(int chsz)$/;"	f
+test_perf_async_steam	scheddev/main3.c	/^test_perf_async_steam(int chsz)$/;"	f
 test_perf_channels	main3.c	/^test_perf_channels(int chsz)$/;"	f
+test_perf_channels	scheddev/main3.c	/^test_perf_channels(int chsz)$/;"	f
+test_remote_asy	scheddev/unit_schedlib.c	/^test_remote_asy(int chsz)$/;"	f
+test_remote_communication	scheddev/unit_schedlib.c	/^test_remote_communication(int sz)$/;"	f
+test_remote_yield	scheddev/unit_schedlib.c	/^void test_remote_yield()$/;"	f
+test_thd_fn	scheddev/unit_schedlib.c	/^test_thd_fn(void *data)$/;"	f
+test_thd_snd	scheddev/unit_schedlib.c	/^test_thd_snd()$/;"	f
+test_yields	scheddev/unit_schedlib.c	/^test_yields(void)$/;"	f
 thd	include/lwt.h	/^	lwt_t thd;$/;"	m	struct:clist_head
+thd	scheddev/include/lwt.h	/^	lwt_t thd;$/;"	m	struct:clist_head
+thd	scheddev/sl_mod_policy.h	/^	struct sl_thd  thd;$/;"	m	struct:sl_thd_policy	typeref:struct:sl_thd_policy::sl_thd
+thd	scheddev/sl_policy.h	/^	struct sl_thd  thd;$/;"	m	struct:sl_thd_policy	typeref:struct:sl_thd_policy::sl_thd
+thdcap	scheddev/sl_thd.h	/^	thdcap_t       thdcap;$/;"	m	struct:sl_thd
+thdid	scheddev/sl_thd.h	/^	thdid_t        thdid;$/;"	m	struct:sl_thd
+threads	scheddev/sl_mod_fprr.c	/^struct ps_list_head threads[SL_FPRR_NPRIOS];$/;"	v	typeref:struct:ps_list_head
 tid	include/lwt.h	/^	uint tid;$/;"	m	struct:_lwt_t
+tid	scheddev/include/lwt.h	/^	uint tid;$/;"	m	struct:_lwt_t
+timeout_next	scheddev/sl.h	/^	tcap_time_t    timeout_next;$/;"	m	struct:sl_global
+timer_next	scheddev/sl.h	/^	cycles_t       timer_next;$/;"	m	struct:sl_global
+u	scheddev/sl.h	/^	} u;$/;"	m	struct:sl_cs	typeref:union:sl_cs::sl_cs_intern
 uchar	include/lwt.h	/^typedef unsigned char uchar;$/;"	t
+uchar	scheddev/include/lwt.h	/^typedef unsigned char uchar;$/;"	t
 uint	include/lwt.h	/^typedef unsigned int uint;$/;"	t
+uint	scheddev/include/lwt.h	/^typedef unsigned int uint;$/;"	t
 ulong	include/lwt.h	/^typedef unsigned long ulong;$/;"	t
+ulong	scheddev/include/lwt.h	/^typedef unsigned long ulong;$/;"	t
 ushort	include/lwt.h	/^typedef unsigned short ushort;$/;"	t
+ushort	scheddev/include/lwt.h	/^typedef unsigned short ushort;$/;"	t
+v	scheddev/sl.h	/^		unsigned long v;$/;"	m	union:sl_cs::sl_cs_intern

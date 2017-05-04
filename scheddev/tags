@@ -8,7 +8,7 @@ ADDITIONAL_LIBS	Makefile	/^ADDITIONAL_LIBS=-lcos_defkernel_api -lcos_kernel_api$
 BUG	sl_thd.h	31;"	d
 BUG	unit_schedlib.c	19;"	d	file:
 COMPONENT	Makefile	/^COMPONENT=unit_sl.o$/;"	m
-DEBUG	include/lwt.h	7;"	d
+DEBUG	include/lwt.h	6;"	d
 DEPENDENCIES	Makefile	/^DEPENDENCIES=$/;"	m
 GRPSZ	main3.c	332;"	d	file:
 IF_LIB	Makefile	/^IF_LIB=$/;"	m
@@ -18,6 +18,7 @@ ITER	main3.c	11;"	d	file:
 KALLOC_H	include/kalloc.h	2;"	d
 LWT_ACTIVE	include/lwt.h	/^	LWT_ACTIVE,$/;"	e	enum:__anon3
 LWT_BLOCKED	include/lwt.h	/^	LWT_BLOCKED,$/;"	e	enum:__anon3
+LWT_CAS	lwt.c	7;"	d	file:
 LWT_DEAD	include/lwt.h	/^	LWT_DEAD,$/;"	e	enum:__anon3
 LWT_INFO_NCHAN	include/lwt.h	/^	LWT_INFO_NCHAN,$/;"	e	enum:__anon2
 LWT_INFO_NRCVING	include/lwt.h	/^	LWT_INFO_NRCVING,$/;"	e	enum:__anon2
@@ -27,7 +28,7 @@ LWT_INFO_NTHD_RUNNABLE	include/lwt.h	/^	LWT_INFO_NTHD_RUNNABLE,$/;"	e	enum:__ano
 LWT_INFO_NTHD_ZOMBIES	include/lwt.h	/^	LWT_INFO_NTHD_ZOMBIES,$/;"	e	enum:__anon2
 LWT_JOIN	include/lwt.h	/^	LWT_JOIN,$/;"	e	enum:__anon4
 LWT_NOJOIN	include/lwt.h	/^	LWT_NOJOIN,$/;"	e	enum:__anon4
-LWT_NULL	include/lwt.h	17;"	d
+LWT_NULL	include/lwt.h	15;"	d
 LWT_WAITING	include/lwt.h	/^	LWT_WAITING,$/;"	e	enum:__anon3
 MANDITORY_LIB	Makefile	/^MANDITORY_LIB=simple_stklib.o$/;"	m
 N_TESTTHDS	unit_schedlib.c	51;"	d	file:
@@ -37,7 +38,7 @@ PRINT_FN	sl_thd.h	29;"	d
 PRINT_FN	unit_schedlib.c	17;"	d	file:
 PS_LIST_DEF_NAME	include/ps_list.h	65;"	d
 PS_LIST_H	include/ps_list.h	50;"	d
-RING_SIZE	include/lwt.h	15;"	d
+RING_SIZE	include/lwt.h	13;"	d
 SL_CONSTS	sl_consts.h	2;"	d
 SL_FPRR_HIGHEST	sl_mod_fprr.c	7;"	d	file:
 SL_FPRR_LOWEST	sl_mod_fprr.c	8;"	d	file:
@@ -55,7 +56,7 @@ SL_THD_RUNNABLE	sl_thd.h	/^	SL_THD_RUNNABLE,$/;"	e	enum:__anon5
 SL_THD_WOKEN	sl_thd.h	/^	SL_THD_WOKEN, 		\/* if a race causes a wakeup before the inevitable block *\/$/;"	e	enum:__anon5
 SPIN	sl_thd.h	32;"	d
 SPIN	unit_schedlib.c	20;"	d	file:
-STACK_SIZE	include/lwt.h	12;"	d
+STACK_SIZE	include/lwt.h	10;"	d
 WORKITERS	unit_schedlib.c	52;"	d	file:
 _LWT_H	include/lwt.h	3;"	d
 __init_thread_head	lwt.c	/^__init_thread_head()$/;"	f
@@ -100,14 +101,21 @@ fn	include/lwt.h	/^	lwt_fn_t fn;$/;"	m	struct:_lwt_t
 fn	unit_schedlib.c	/^fn(void)$/;"	f
 fn1	unit_schedlib.c	/^fn1(lwt_chan_t from)$/;"	f
 fn2	unit_schedlib.c	/^fn2(lwt_chan_t to)$/;"	f
+fn_arcv	unit_schedlib.c	/^fn_arcv(lwt_chan_t from)$/;"	f
+fn_asnd	unit_schedlib.c	/^fn_asnd(lwt_chan_t to)$/;"	f
 fn_async_steam	main3.c	/^fn_async_steam(lwt_chan_t to)$/;"	f
 fn_bounce	main3.c	/^fn_bounce(void *d) $/;"	f
 fn_chan	main3.c	/^fn_chan(lwt_chan_t to)$/;"	f
+fn_cpy	unit_schedlib.c	/^fn_cpy(void)$/;"	f
+fn_grp_snd	unit_schedlib.c	/^fn_grp_snd(void *d)$/;"	f
 fn_grpwait	main3.c	/^fn_grpwait(lwt_chan_t c)$/;"	f
 fn_identity	main3.c	/^fn_identity(void *d)$/;"	f
 fn_join	main3.c	/^fn_join(void *d)$/;"	f
+fn_multisend	unit_schedlib.c	/^fn_multisend(lwt_chan_t c)$/;"	f
+fn_multiwait	unit_schedlib.c	/^fn_multiwait(lwt_chan_t c)$/;"	f
 fn_nested_joins	main3.c	/^fn_nested_joins(void *d)$/;"	f
 fn_null	main3.c	/^fn_null(void *d)$/;"	f
+fn_nulll	unit_schedlib.c	/^fn_nulll(void* d)$/;"	f
 fn_print	unit_schedlib.c	/^fn_print(void* data)$/;"	f
 fn_rcv_thd	unit_schedlib.c	/^fn_rcv_thd(lwt_chan_t from)$/;"	f
 fn_sequence	main3.c	/^fn_sequence(void *d)$/;"	f
@@ -137,6 +145,10 @@ list	include/lwt.h	/^	struct ps_list list;$/;"	m	struct:clist_head	typeref:struc
 list	include/lwt.h	/^	struct ps_list list;$/;"	m	struct:lwt_channel	typeref:struct:lwt_channel::ps_list
 list	sl_mod_policy.h	/^	struct ps_list list;$/;"	m	struct:sl_thd_policy	typeref:struct:sl_thd_policy::ps_list
 list	sl_policy.h	/^	struct ps_list list;$/;"	m	struct:sl_thd_policy	typeref:struct:sl_thd_policy::ps_list
+lm_fn_chan	compare_test_file.c	/^lm_fn_chan(lwt_chan_t to)$/;"	f
+lm_fn_identity	compare_test_file.c	/^lm_fn_identity(void *d)$/;"	f
+lm_fn_multiwait	compare_test_file.c	/^lm_fn_multiwait(void *d)$/;"	f
+lm_fn_null	compare_test_file.c	/^lm_fn_null(void *d)$/;"	f
 lock	sl.h	/^	struct sl_cs   lock;$/;"	m	struct:sl_global	typeref:struct:sl_global::sl_cs
 lwt	include/lwt.h	/^	lwt_t lwt;$/;"	m	struct:__kthd_parm_t
 lwt_cgrp	lwt.c	/^lwt_cgrp(void)$/;"	f
@@ -239,11 +251,13 @@ ps_list_singleton_d	include/ps_list.h	148;"	d
 ps_offsetof	include/ps_list.h	100;"	d
 rcv_blocked	include/lwt.h	/^	int rcv_blocked;$/;"	m	struct:lwt_channel
 rcv_thd	include/lwt.h	/^	lwt_t rcv_thd;	 			\/* the receiver *\/$/;"	m	struct:lwt_channel
+rdtscll	compare_test_file.c	7;"	d	file:
 rdtscll	main3.c	9;"	d	file:
 return_val	include/lwt.h	/^	void *return_val;$/;"	m	struct:_lwt_t
 ring_buffer	include/lwt.h	/^typedef struct ring_buffer $/;"	s
 ring_buffer	include/lwt.h	/^} ring_buffer;$/;"	t	typeref:struct:ring_buffer
 run	kalloc.c	/^struct run {$/;"	s	file:
+run_lm_tests	compare_test_file.c	/^run_lm_tests()$/;"	f
 runable_counter	include/lwt.h	/^	uint runable_counter;$/;"	m	struct:_global_counter_t
 s	sl.h	/^		} PS_PACKED s;$/;"	m	union:sl_cs::sl_cs_intern	typeref:struct:sl_cs::sl_cs_intern::__anon1
 sched	main3.c	/^volatile int sched[2] = {0, 0};$/;"	v
@@ -324,12 +338,20 @@ test_blocking_directed_yield	unit_schedlib.c	/^test_blocking_directed_yield(void
 test_crt_join_sched	main3.c	/^test_crt_join_sched(void)$/;"	f
 test_grpwait	main3.c	/^test_grpwait(int chsz, int grpsz)$/;"	f
 test_high	unit_schedlib.c	/^test_high(void *data)$/;"	f
+test_kthd_create	unit_schedlib.c	/^test_kthd_create(void)$/;"	f
+test_kthd_multiwait	unit_schedlib.c	/^test_kthd_multiwait()$/;"	f
+test_kthd_yield	unit_schedlib.c	/^test_kthd_yield(void)$/;"	f
 test_low	unit_schedlib.c	/^test_low(void *data)$/;"	f
+test_lwt_cgrp	compare_test_file.c	/^test_lwt_cgrp()$/;"	f
+test_lwt_channel	compare_test_file.c	/^test_lwt_channel()$/;"	f
+test_lwt_create	compare_test_file.c	/^test_lwt_create(void)$/;"	f
+test_lwt_yield	compare_test_file.c	/^test_lwt_yield(void)$/;"	f
 test_multisend	main3.c	/^test_multisend(int chsz)$/;"	f
 test_perf	main3.c	/^test_perf(void)$/;"	f
 test_perf_async_steam	main3.c	/^test_perf_async_steam(int chsz)$/;"	f
 test_perf_channels	main3.c	/^test_perf_channels(int chsz)$/;"	f
-test_remote_communication	unit_schedlib.c	/^test_remote_communication()$/;"	f
+test_remote_asy	unit_schedlib.c	/^test_remote_asy(int chsz)$/;"	f
+test_remote_communication	unit_schedlib.c	/^test_remote_communication(int sz)$/;"	f
 test_remote_yield	unit_schedlib.c	/^void test_remote_yield()$/;"	f
 test_thd_fn	unit_schedlib.c	/^test_thd_fn(void *data)$/;"	f
 test_thd_snd	unit_schedlib.c	/^test_thd_snd()$/;"	f
